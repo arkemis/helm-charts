@@ -1,4 +1,4 @@
-kubernetesClusterDomain: ""
+kubernetesClusterDomain: cluster.local
 namespace: ""
 certIssuer: ""
 deployment:

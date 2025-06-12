@@ -8,7 +8,7 @@ The following table lists the configurable parameters of the frontend chart and 
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `kubernetesClusterDomain` | Kubernetes cluster domain | `""` |
+| `kubernetesClusterDomain` | Kubernetes cluster domain | `cluster.local` |
 | `namespace` | Kubernetes namespace | `""` |
 | `certIssuer` | Certificate issuer name | `""` |
 | `deployment.replicas` | Number of frontend pods | `1` |
