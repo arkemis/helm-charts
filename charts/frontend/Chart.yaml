@@ -1,0 +1,12 @@
+apiVersion: v2
+name: frontend
+description: Frontend application for Arkemis
+icon: https://arkemis.it/favicon.ico
+type: application
+maintainers:
+  - name: Arkemis S.r.l.
+    url: https://github.com/arkemishub/helm-charts
+sources:
+  - https://github.com/arkemishub/helm-charts/tree/main/charts/frontend
+appVersion: "0.1.0"
+version: 0.1.0

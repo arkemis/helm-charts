@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: {{ include "frontend.fullname" . }}-frontend
+  labels:
+  {{- include "frontend.labels" . | nindent 4 }}
+  annotations:
+    deployment.kubernetes.io/revision: "13"
+spec:
+  replicas: {{ .Values.deployment.replicas }}
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  selector:
+    matchLabels:
+    {{- include "frontend.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+      {{- include "frontend.selectorLabels" . | nindent 8 }}
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2025-05-27T22:35:32+02:00"
+    spec:
+      automountServiceAccountToken: true
+      containers:
+        - envFrom:
+          - configMapRef:
+              name: {{ include "frontend.fullname" . }}-frontend
+              optional: false
+          image: '{{ .Values.deployment.repository }}:{{
+            .Values.deployment.tag | default .Chart.AppVersion
+            }}'
+          imagePullPolicy: Always
+          name: frontend
+          ports:
+          - containerPort: 3000
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: true
+      imagePullSecrets:
+      - name: {{ .Values.deployment.imagePullSecret }}
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      shareProcessNamespace: false
+      terminationGracePeriodSeconds: 30
