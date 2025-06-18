@@ -22,8 +22,6 @@ spec:
     metadata:
       labels:
       {{- include "frontend.selectorLabels" . | nindent 8 }}
-      annotations:
-        kubectl.kubernetes.io/restartedAt: "2025-05-27T22:35:32+02:00"
     spec:
       automountServiceAccountToken: true
       containers:
@@ -31,9 +29,7 @@ spec:
           - configMapRef:
               name: {{ include "frontend.fullname" . }}-frontend
               optional: false
-          image: '{{ .Values.deployment.repository }}:{{
-            .Values.deployment.tag | default .Chart.AppVersion
-            }}'
+          image: {{ .Values.deployment.image }}
           imagePullPolicy: Always
           name: frontend
           ports:

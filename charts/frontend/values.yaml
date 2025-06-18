@@ -3,8 +3,7 @@ namespace: ""
 certIssuer: ""
 deployment:
   replicas: 1
-  repository: ""
-  tag: ""
+  image: ""
   imagePullSecret: ""
 service:
   ports:
