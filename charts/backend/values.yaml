@@ -1,0 +1,26 @@
+kubernetesClusterDomain: cluster.local
+certIssuer: ""
+namespace: ""
+configMap:
+  env:
+deployment:
+  replicas: 1
+  image: ""
+  imagePullSecret: ""
+service:
+  ports:
+    - port: 4000
+      protocol: TCP
+      targetPort: 4000
+internalIngress:
+  enabled: false
+db:
+  host: ""
+  name: ""
+  password: ""
+  port: "5432"
+  user: postgres
+ingress:
+  hosts: []
+gcloudServiceKey:
+  enabled: false
