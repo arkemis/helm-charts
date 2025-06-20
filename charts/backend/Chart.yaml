@@ -8,5 +8,5 @@ maintainers:
     url: https://github.com/arkemishub/helm-charts
 sources:
   - https://github.com/arkemishub/helm-charts/tree/main/charts/backend
-version: 0.1.0
+version: 0.1.1
 appVersion: "0.1.0"
