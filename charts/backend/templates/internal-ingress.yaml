@@ -1,0 +1,36 @@
+{{ if .Values.internalIngress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: {{ include "backend.fullname" . }}-backend-internal-0
+  labels:
+  {{- include "backend.labels" . | nindent 4 }}
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 15m
+    nginx.ingress.kubernetes.io/rewrite-target: /internal/$1
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/whitelist-source-range: 10.224.0.0/14
+    nginx.org/client-max-body-size: 15m
+spec:
+  ingressClassName: nginx
+  rules:
+  {{- range .Values.ingress.hosts }}
+  - host: {{ . }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: {{ include "backend.fullname" $ }}-backend
+            port:
+              number: 4000
+        path: /api/internal/(.+)
+        pathType: Prefix
+  {{- end }}
+  tls:
+  - hosts:
+  {{- range .Values.ingress.hosts }}
+    - {{ . }}
+  {{- end }}
+  secretName: {{ include "backend.fullname" . }}-backend-internal-0-tls
+{{ end }}

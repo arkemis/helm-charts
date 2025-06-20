@@ -1,0 +1,113 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: {{ include "backend.fullname" . }}-backend-0
+  labels:
+  {{- include "backend.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.deployment.replicas }}
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      {{- include "backend.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "backend.selectorLabels" . | nindent 8 }}
+    spec:
+      automountServiceAccountToken: true
+      containers:
+      - env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        {{ if .Values.gcloudServiceKey.enabled }}
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          valueFrom:
+            secretKeyRef:
+              key: google_application_credentials
+              name: {{ include "backend.fullname" . }}-gcloud-service-key
+              optional: false
+        - name: DEFAULT_BUCKET
+          valueFrom:
+            secretKeyRef:
+              key: default_bucket
+              name: {{ include "backend.fullname" . }}-gcloud-service-key
+              optional: false
+        - name: STORAGE_SERVICE_ACCOUNT
+          valueFrom:
+            secretKeyRef:
+              key: service_account
+              name: {{ include "backend.fullname" . }}-gcloud-service-key
+              optional: false
+        {{ end }}
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        envFrom:
+        - configMapRef:
+            name: {{ include "backend.fullname" . }}-backend
+            optional: false
+        - secretRef:
+            name: {{ include "backend.fullname" . }}-secret
+            optional: false
+        image: {{ .Values.deployment.image }}
+        imagePullPolicy: Always
+        name: backend
+        ports:
+        - containerPort: 4000
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: lib/health/ready
+            port: 4000
+            scheme: HTTP
+          periodSeconds: 300
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources: 
+          requests:
+            memory: "0"
+        startupProbe:
+          failureThreshold: 3
+          httpGet:
+            path: lib/health/start
+            port: 4000
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        {{ if .Values.gcloudServiceKey.enabled }}
+        - mountPath: /var/secrets
+          mountPropagation: None
+          name: google-cloud-key
+          readOnly: true
+        {{ end }}
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: true
+      imagePullSecrets:
+      - name: {{ .Values.deployment.imagePullSecret }}
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      shareProcessNamespace: false
+      terminationGracePeriodSeconds: 30
+      volumes:
+      {{ if .Values.gcloudServiceKey.enabled }}
+      - name: google-cloud-key
+        secret:
+          defaultMode: 420
+          optional: false
+          secretName: {{ include "backend.fullname" . }}-gcloud-service-key
+      {{ end }}

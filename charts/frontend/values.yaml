@@ -11,6 +11,6 @@ service:
       protocol: TCP
       targetPort: 3000
 configMap:
-  env: {}
+  env:
 ingress:
   hosts: []
