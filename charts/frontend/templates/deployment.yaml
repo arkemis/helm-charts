@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: {{ .Values.namespace }}
-  name: {{ include "frontend.fullname" . }}-frontend
+  name: {{ include "frontend.fullname" . }}
   labels:
   {{- include "frontend.labels" . | nindent 4 }}
   annotations:
