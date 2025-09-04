@@ -7,7 +7,7 @@ on:
 
 jobs:
   release:
-    if: ${{ github.repository_owner == 'arkemishub' }}
+    if: ${{ github.repository_owner == 'arkemis' }}
     permissions:
       contents: write
     runs-on: ubuntu-latest
