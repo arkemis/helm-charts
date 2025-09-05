@@ -9,4 +9,4 @@ maintainers:
 sources:
   - https://github.com/arkemishub/helm-charts/tree/main/charts/frontend
 appVersion: "0.1.0"
-version: 0.2.1
+version: 0.2.2

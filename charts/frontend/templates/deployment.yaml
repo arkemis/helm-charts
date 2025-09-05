@@ -42,7 +42,7 @@ spec:
       enableServiceLinks: true
       imagePullSecrets:
       - name: {{ .Values.deployment.imagePullSecret }}
-      restartPolicy: Always
+      restartPolicy: {{ .Values.deployment.restartPolicy }}
       schedulerName: default-scheduler
       securityContext: {}
       shareProcessNamespace: false

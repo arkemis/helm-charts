@@ -5,6 +5,7 @@ deployment:
   replicas: 1
   image: ""
   imagePullSecret: ""
+  restartPolicy: Always
 service:
   ports:
     - port: 3000
