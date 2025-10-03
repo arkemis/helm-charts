@@ -10,7 +10,7 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-body-size: 15m
     nginx.ingress.kubernetes.io/rewrite-target: /internal/$1
     nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/whitelist-source-range: 10.224.0.0/14
+    nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.internalIngress.whitelistSourceRange }}
     nginx.org/client-max-body-size: 15m
 spec:
   ingressClassName: nginx
