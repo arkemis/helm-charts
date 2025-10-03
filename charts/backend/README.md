@@ -17,6 +17,7 @@ The following table lists the configurable parameters of the backend chart and t
 | `service.ports` | List of service ports | `[{port: 4000, protocol: TCP, targetPort: 4000}]` |
 | `configMap.env` | Environment variables | `{}` |
 | `internalIngress.enabled` | Enable internal ingress | `false` |
+| `internalIngress.whitelistSourceRange` | CIDR internal ip addresses | `false` |
 | `db.host` | Database host | `""` |
 | `db.name` | Database name | `""` |
 | `db.password` | Database password | `""` |

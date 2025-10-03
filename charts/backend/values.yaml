@@ -15,6 +15,7 @@ service:
       targetPort: 4000
 internalIngress:
   enabled: false
+  whitelistSourceRange: ""
 db:
   host: ""
   name: ""
