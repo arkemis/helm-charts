@@ -6,6 +6,13 @@ deployment:
   image: ""
   imagePullSecret: ""
   restartPolicy: Always
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "1000m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
 service:
   ports:
     - port: 3000

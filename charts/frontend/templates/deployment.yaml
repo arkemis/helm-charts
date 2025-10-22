@@ -35,9 +35,15 @@ spec:
           ports:
           - containerPort: 3000
             protocol: TCP
-          resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
+          resources: 
+            requests:
+              memory: {{ .Values.deployment.resources.requests.memory }}
+              cpu: {{ .Values.deployment.resources.requests.cpu }}
+            limits:
+              memory: {{ .Values.deployment.resources.limits.memory }}
+              cpu: {{ .Values.deployment.resources.limits.cpu }}
       dnsPolicy: ClusterFirst
       enableServiceLinks: true
       imagePullSecrets:
