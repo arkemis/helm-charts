@@ -38,12 +38,8 @@ spec:
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           resources: 
-            requests:
-              memory: {{ .Values.deployment.resources.requests.memory }}
-              cpu: {{ .Values.deployment.resources.requests.cpu }}
-            limits:
-              memory: {{ .Values.deployment.resources.limits.memory }}
-              cpu: {{ .Values.deployment.resources.limits.cpu }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
       dnsPolicy: ClusterFirst
       enableServiceLinks: true
       imagePullSecrets:
