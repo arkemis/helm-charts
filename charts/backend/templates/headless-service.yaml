@@ -4,8 +4,11 @@ metadata:
   namespace: {{ .Values.namespace }}
   name: {{ include "backend.fullname" . }}-backend-headless
   labels:
-  {{- include "backend.labels" . | nindent 4 }}
+    {{- include "backend.labels" . | nindent 4 }}
 spec:
   type: ClusterIP
+  clusterIP: None
+  selector:
+    {{- include "backend.selectorLabels" . | nindent 4 }}
   ports:
-  {{- .Values.service.ports | toYaml | nindent 2 }}
+    {{- .Values.service.ports | toYaml | nindent 2 }}
