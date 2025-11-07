@@ -3,6 +3,22 @@ entries:
   backend:
   - apiVersion: v2
     appVersion: 0.1.0
+    created: "2025-11-07T11:29:46.23272914Z"
+    description: Backend application for Arkemis
+    digest: 8e43d0fd1a7f1fe242f87d5be3ce5d77411c5cbf25090e44f131f73c5fe3ef1e
+    icon: https://arkemis.it/favicon.ico
+    maintainers:
+    - name: Arkemis S.r.l.
+      url: https://github.com/arkemishub/helm-charts
+    name: backend
+    sources:
+    - https://github.com/arkemishub/helm-charts/tree/main/charts/backend
+    type: application
+    urls:
+    - https://github.com/arkemis/helm-charts/releases/download/backend-0.1.5/backend-0.1.5.tgz
+    version: 0.1.5
+  - apiVersion: v2
+    appVersion: 0.1.0
     created: "2025-10-03T18:27:09.264817089Z"
     description: Backend application for Arkemis
     digest: e444d7cff0f99d2d6ae6334db718df61cd427788d7ffba25026d3604013850f0
@@ -162,4 +178,4 @@ entries:
     urls:
     - https://github.com/arkemishub/helm-charts/releases/download/frontend-0.1.0/frontend-0.1.0.tgz
     version: 0.1.0
-generated: "2025-10-22T11:47:20.575844832Z"
+generated: "2025-11-07T11:29:46.232786958Z"
