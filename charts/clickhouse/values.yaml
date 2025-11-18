@@ -4,13 +4,7 @@ clickhouse:
   nativePort: 9000
 
   # Resource limits
-  resources:
-    limits:
-      cpu: "2"
-      memory: "4Gi"
-    requests:
-      cpu: "500m"
-      memory: "1Gi"
+  resources: {}
 
   # Persistence
   persistence:
