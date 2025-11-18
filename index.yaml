@@ -84,6 +84,16 @@ entries:
   clickhouse:
   - apiVersion: v2
     appVersion: 25.7.0-alpine
+    created: "2025-11-18T16:48:15.423148956Z"
+    description: A Helm chart for ClickHouse deployment
+    digest: e4730a9838799a732cb52a89ae7b0551bfb056a5367da4de77f0f9a3e7dbc2c0
+    name: clickhouse
+    type: application
+    urls:
+    - https://github.com/arkemis/helm-charts/releases/download/clickhouse-0.1.1/clickhouse-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 25.7.0-alpine
     created: "2025-11-18T13:53:13.643909959Z"
     description: A Helm chart for ClickHouse deployment
     digest: db3157d0b358829a1fbcb9d57f666b4c5560365d13fc4a5be90b7d376369b32a
@@ -189,4 +199,4 @@ entries:
     urls:
     - https://github.com/arkemishub/helm-charts/releases/download/frontend-0.1.0/frontend-0.1.0.tgz
     version: 0.1.0
-generated: "2025-11-18T13:53:13.643943551Z"
+generated: "2025-11-18T16:48:15.423185564Z"
