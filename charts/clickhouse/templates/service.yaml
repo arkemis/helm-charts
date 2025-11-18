@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "clickhouse.fullname" . }}-clickhouse
+  labels:
+    {{- include "clickhouse.labels" . | nindent 4 }}
+  {{- if .Values.clickhouse.service.annotations }}
+  annotations:
+    {{- with .Values.clickhouse.service.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- end }}
+spec:
+  type: {{ .Values.clickhouse.service.type | default "ClusterIP" }}
+  ports:
+    - port: {{ .Values.clickhouse.port }}
+      targetPort: {{ .Values.clickhouse.port }}
+      name: http
+    - port: {{ .Values.clickhouse.nativePort }}
+      targetPort: {{ .Values.clickhouse.nativePort }}
+      name: native
+    {{- if .Values.clickhouse.prometheus.enabled }}
+    - port: {{ .Values.clickhouse.prometheus.port }}
+      targetPort: {{ .Values.clickhouse.prometheus.port }}
+      name: prometheus
+    {{- end }}
+  selector:
+    {{- include "clickhouse.selectorLabels" . | nindent 4 }}
+    app: clickhouse
