@@ -1,0 +1,130 @@
+<?xml version="1.0"?>
+<clickhouse>
+   <user_directories>
+        <users_xml>
+            <path>/etc/clickhouse-server/users.xml</path>
+        </users_xml>
+    </user_directories>
+
+    <logger>
+        <level>information</level>
+        <console>true</console>
+        <log remove="remove"/>
+        <errorlog remove="remove"/>
+    </logger>
+
+    <listen_host>0.0.0.0</listen_host>
+    <http_port>{{ .Values.clickhouse.port }}</http_port>
+    <tcp_port>{{ .Values.clickhouse.nativePort }}</tcp_port>
+
+    <max_connections>4096</max_connections>
+    <keep_alive_timeout>64</keep_alive_timeout>
+    <max_concurrent_queries>100</max_concurrent_queries>
+    <uncompressed_cache_size>8589934592</uncompressed_cache_size>
+    <mark_cache_size>5368709120</mark_cache_size>
+
+    <path>/var/lib/clickhouse/</path>
+    <tmp_path>/var/lib/clickhouse/tmp/</tmp_path>
+    <user_files_path>/var/lib/clickhouse/user_files/</user_files_path>
+
+    <users_config>users.xml</users_config>
+    <default_profile>default</default_profile>
+    <default_database>default</default_database>
+    <timezone>UTC</timezone>
+    <mlock_executable>false</mlock_executable>
+
+    <shutdown_wait_unfinished>60</shutdown_wait_unfinished>
+
+    {{- if .Values.clickhouse.prometheus.enabled }}
+    <prometheus>
+        <endpoint>{{ .Values.clickhouse.prometheus.endpoint }}</endpoint>
+        <port>{{ .Values.clickhouse.prometheus.port }}</port>
+        <metrics>true</metrics>
+        <events>true</events>
+        <asynchronous_metrics>true</asynchronous_metrics>
+        <errors>true</errors>
+    </prometheus>
+    {{- end }}
+
+    <query_log>
+        <database>system</database>
+        <table>query_log</table>
+        <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+    </query_log>
+
+    <metric_log>
+        <database>system</database>
+        <table>metric_log</table>
+        <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+        <collect_interval_milliseconds>1000</collect_interval_milliseconds>
+    </metric_log>
+
+    <asynchronous_metric_log>
+        <database>system</database>
+        <table>asynchronous_metric_log</table>
+        <flush_interval_milliseconds>7000</flush_interval_milliseconds>
+    </asynchronous_metric_log>
+
+    <opentelemetry_span_log>
+        <engine>
+            engine MergeTree
+            partition by toYYYYMM(finish_date)
+            order by (finish_date, finish_time_us, trace_id)
+        </engine>
+        <database>system</database>
+        <table>opentelemetry_span_log</table>
+        <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+    </opentelemetry_span_log>
+
+
+    <crash_log>
+        <database>system</database>
+        <table>crash_log</table>
+
+        <partition_by />
+        <flush_interval_milliseconds>1000</flush_interval_milliseconds>
+    </crash_log>
+
+    <processors_profile_log>
+        <database>system</database>
+        <table>processors_profile_log</table>
+
+        <partition_by>toYYYYMM(event_date)</partition_by>
+        <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+    </processors_profile_log>
+
+    <part_log>
+        <database>system</database>
+        <table>part_log</table>
+        <partition_by>toYYYYMM(event_date)</partition_by>
+        <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+    </part_log>
+
+    <trace_log>
+        <database>system</database>
+        <table>trace_log</table>
+
+        <partition_by>toYYYYMM(event_date)</partition_by>
+        <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+    </trace_log>
+
+    <query_thread_log>
+        <database>system</database>
+        <table>query_thread_log</table>
+        <partition_by>toYYYYMM(event_date)</partition_by>
+        <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+    </query_thread_log>
+
+    <query_views_log>
+        <database>system</database>
+        <table>query_views_log</table>
+        <partition_by>toYYYYMM(event_date)</partition_by>
+        <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+    </query_views_log>
+
+    <distributed_ddl>
+        <path>/clickhouse/task_queue/ddl</path>
+    </distributed_ddl>
+
+    <format_schema_path>/var/lib/clickhouse/format_schemas/</format_schema_path>
+</clickhouse>

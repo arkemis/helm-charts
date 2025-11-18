@@ -1,0 +1,41 @@
+{{- if .Values.clickhouse.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "clickhouse.fullname" . }}-clickhouse-data
+  labels:
+    {{- include "clickhouse.labels" . | nindent 4 }}
+  {{- if .Values.global.keepPVC }}
+  annotations:
+    "helm.sh/resource-policy": keep
+  {{- end }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  {{- if .Values.global.storageClassName }}
+  storageClassName: {{ .Values.global.storageClassName }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.clickhouse.persistence.dataSize }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "clickhouse.fullname" . }}-clickhouse-logs
+  labels:
+    {{- include "clickhouse.labels" . | nindent 4 }}
+  {{- if .Values.global.keepPVC }}
+  annotations:
+    "helm.sh/resource-policy": keep
+  {{- end }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  {{- if .Values.global.storageClassName }}
+  storageClassName: {{ .Values.global.storageClassName }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.clickhouse.persistence.logSize }}
+{{- end }}
