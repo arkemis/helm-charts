@@ -20,3 +20,5 @@ configMap:
   env: {}
 ingress:
   hosts: []
+externalSecret:
+  enabled: false

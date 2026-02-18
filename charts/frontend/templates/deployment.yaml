@@ -20,6 +20,8 @@ spec:
     {{- include "frontend.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+      annotations:
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
       labels:
       {{- include "frontend.selectorLabels" . | nindent 8 }}
     spec:
