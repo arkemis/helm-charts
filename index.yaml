@@ -3,6 +3,22 @@ entries:
   backend:
   - apiVersion: v2
     appVersion: 0.1.0
+    created: "2026-02-18T15:35:45.764785602Z"
+    description: Backend application for Arkemis
+    digest: 7fc8ce720a4720deaf222897363eb7fd2ea054253045cf9764f6fc5d331c3e42
+    icon: https://arkemis.it/favicon.ico
+    maintainers:
+    - name: Arkemis S.r.l.
+      url: https://github.com/arkemishub/helm-charts
+    name: backend
+    sources:
+    - https://github.com/arkemishub/helm-charts/tree/main/charts/backend
+    type: application
+    urls:
+    - https://github.com/arkemis/helm-charts/releases/download/backend-0.1.6/backend-0.1.6.tgz
+    version: 0.1.6
+  - apiVersion: v2
+    appVersion: 0.1.0
     created: "2025-11-07T11:29:46.23272914Z"
     description: Backend application for Arkemis
     digest: 8e43d0fd1a7f1fe242f87d5be3ce5d77411c5cbf25090e44f131f73c5fe3ef1e
@@ -105,6 +121,22 @@ entries:
   frontend:
   - apiVersion: v2
     appVersion: 0.1.0
+    created: "2026-02-18T15:35:45.967138619Z"
+    description: Frontend application for Arkemis
+    digest: c782f50a2f9d2ac01f14ea846977836b3d29b1d209f2de8051abcf2f76858af0
+    icon: https://arkemis.it/favicon.ico
+    maintainers:
+    - name: Arkemis S.r.l.
+      url: https://github.com/arkemishub/helm-charts
+    name: frontend
+    sources:
+    - https://github.com/arkemishub/helm-charts/tree/main/charts/frontend
+    type: application
+    urls:
+    - https://github.com/arkemis/helm-charts/releases/download/frontend-0.2.5/frontend-0.2.5.tgz
+    version: 0.2.5
+  - apiVersion: v2
+    appVersion: 0.1.0
     created: "2025-10-22T11:47:20.575816398Z"
     description: Frontend application for Arkemis
     digest: 6140a6f770f2260e366068a86c6a494dc3d1fed653e56a5886899657340f0645
@@ -199,4 +231,4 @@ entries:
     urls:
     - https://github.com/arkemishub/helm-charts/releases/download/frontend-0.1.0/frontend-0.1.0.tgz
     version: 0.1.0
-generated: "2025-11-18T16:48:15.423185564Z"
+generated: "2026-02-18T15:35:45.967203862Z"
