@@ -1,6 +1,0 @@
-apiVersion: v2
-name: clickhouse
-description: A Helm chart for ClickHouse deployment
-type: application
-version: 0.1.1
-appVersion: "25.7.0-alpine"
