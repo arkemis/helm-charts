@@ -20,4 +20,10 @@ configMap:
   env: {}
 ingress:
   hosts: []
+secretStore:
+  enabled: false
+  name: ""
+  server: ""
+  auth:
+    role: ""
 externalSecrets: []
