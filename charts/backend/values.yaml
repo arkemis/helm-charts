@@ -26,5 +26,4 @@ ingress:
   hosts: []
 gcloudServiceKey:
   enabled: false
-externalSecret:
-  enabled: false
+externalSecrets: []
