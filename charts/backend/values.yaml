@@ -39,7 +39,7 @@ containerSecurityContext:
   # -- Disallow privilege escalation
   allowPrivilegeEscalation: false
   # -- Mount root filesystem as read-only
-  readOnlyRootFilesystem: false
+  readOnlyRootFilesystem: true
   capabilities:
     # -- Linux capabilities to drop
     drop:

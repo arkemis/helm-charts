@@ -39,7 +39,7 @@ containerSecurityContext:
   # -- Disallow privilege escalation
   allowPrivilegeEscalation: false
   # -- Mount root filesystem as read-only
-  readOnlyRootFilesystem: false
+  readOnlyRootFilesystem: true
   capabilities:
     # -- Linux capabilities to drop
     drop:
@@ -59,7 +59,7 @@ resources:
 ## Startup probe parameters
 startupProbe:
   # -- Enable startup probe
-  enabled: false
+  enabled: true
   # -- HTTP path for startup check
   path: /
   # -- Port name or number for startup check
@@ -78,7 +78,7 @@ startupProbe:
 ## Readiness probe parameters
 readinessProbe:
   # -- Enable readiness probe
-  enabled: false
+  enabled: true
   # -- HTTP path for readiness check
   path: /
   # -- Port name or number for readiness check
@@ -97,7 +97,7 @@ readinessProbe:
 ## Liveness probe parameters
 livenessProbe:
   # -- Enable liveness probe
-  enabled: false
+  enabled: true
   # -- HTTP path for liveness check
   path: /
   # -- Port name or number for liveness check

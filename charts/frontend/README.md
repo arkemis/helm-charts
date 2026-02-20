@@ -16,7 +16,7 @@ helm install my-frontend arkemis/frontend
 | configMap.env | object | `{}` | Key-value pairs injected as environment variables via ConfigMap |
 | containerSecurityContext.allowPrivilegeEscalation | bool | `false` | Disallow privilege escalation |
 | containerSecurityContext.capabilities.drop | list | `["ALL"]` | Linux capabilities to drop |
-| containerSecurityContext.readOnlyRootFilesystem | bool | `false` | Mount root filesystem as read-only |
+| containerSecurityContext.readOnlyRootFilesystem | bool | `true` | Mount root filesystem as read-only |
 | containerSecurityContext.runAsNonRoot | bool | `true` | Require non-root user |
 | externalSecrets | list | `[]` | List of ExternalSecret definitions |
 | extraEnvVars | list | `[]` | Additional environment variables |
@@ -34,7 +34,7 @@ helm install my-frontend arkemis/frontend
 | ingress.hosts | list | `[]` | List of ingress hostnames |
 | ingress.ingressClassName | string | `"nginx"` | Ingress class name |
 | kubernetesClusterDomain | string | `"cluster.local"` | Kubernetes cluster domain |
-| livenessProbe.enabled | bool | `false` | Enable liveness probe |
+| livenessProbe.enabled | bool | `true` | Enable liveness probe |
 | livenessProbe.failureThreshold | int | `6` | Failures before restarting |
 | livenessProbe.initialDelaySeconds | int | `10` | Delay before first probe |
 | livenessProbe.path | string | `"/"` | HTTP path for liveness check |
@@ -49,7 +49,7 @@ helm install my-frontend arkemis/frontend
 | podLabels | object | `{}` | Additional pod labels |
 | podSecurityContext.fsGroup | int | `1001` | Group ID for filesystem access |
 | podSecurityContext.runAsNonRoot | bool | `true` | Require non-root user |
-| readinessProbe.enabled | bool | `false` | Enable readiness probe |
+| readinessProbe.enabled | bool | `true` | Enable readiness probe |
 | readinessProbe.failureThreshold | int | `3` | Failures before marking unready |
 | readinessProbe.initialDelaySeconds | int | `5` | Delay before first probe |
 | readinessProbe.path | string | `"/"` | HTTP path for readiness check |
@@ -67,7 +67,7 @@ helm install my-frontend arkemis/frontend
 | secretStore.server | string | `""` | Vault/OpenBao server URL |
 | service.port | int | `3000` | Service and container port |
 | service.type | string | `"ClusterIP"` | Kubernetes service type |
-| startupProbe.enabled | bool | `false` | Enable startup probe |
+| startupProbe.enabled | bool | `true` | Enable startup probe |
 | startupProbe.failureThreshold | int | `30` | Failures before marking unhealthy |
 | startupProbe.initialDelaySeconds | int | `5` | Delay before first probe |
 | startupProbe.path | string | `"/"` | HTTP path for startup check |

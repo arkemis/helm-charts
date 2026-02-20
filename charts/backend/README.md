@@ -16,7 +16,7 @@ helm install my-backend arkemis/backend
 | configMap.env | object | `{}` | Key-value pairs injected as environment variables via ConfigMap |
 | containerSecurityContext.allowPrivilegeEscalation | bool | `false` | Disallow privilege escalation |
 | containerSecurityContext.capabilities.drop | list | `["ALL"]` | Linux capabilities to drop |
-| containerSecurityContext.readOnlyRootFilesystem | bool | `false` | Mount root filesystem as read-only |
+| containerSecurityContext.readOnlyRootFilesystem | bool | `true` | Mount root filesystem as read-only |
 | containerSecurityContext.runAsNonRoot | bool | `true` | Require non-root user |
 | externalSecrets | list | `[]` | List of ExternalSecret definitions |
 | extraEnvVars | list | `[]` | Additional environment variables |
