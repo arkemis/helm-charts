@@ -1,35 +1,182 @@
+# -- Kubernetes cluster domain
 kubernetesClusterDomain: cluster.local
-certIssuer: ""
+# -- Override the chart name
+nameOverride: ""
+# -- Override the fully qualified app name
+fullnameOverride: ""
+
+# -- Namespace to deploy resources into (also creates the namespace if set)
 namespace: ""
-configMap:
-  env:
-deployment:
-  replicas: 1
-  image: ""
-  imagePullSecret: ""
-  restartPolicy: Always
+# -- Labels to apply to the created namespace
+namespaceLabels: {}
+
+## Image parameters
+image:
+  # -- Container image registry
+  registry: ghcr.io
+  # -- Container image repository
+  repository: ""
+  # -- Container image tag (defaults to chart appVersion)
+  tag: ""
+  # -- Image pull policy
+  pullPolicy: Always
+  # -- List of image pull secret names
+  pullSecrets: []
+
+# -- Number of pod replicas
+replicaCount: 1
+
+## Security parameters
+podSecurityContext:
+  # -- Require non-root user
+  runAsNonRoot: true
+  # -- Group ID for filesystem access
+  fsGroup: 1001
+
+containerSecurityContext:
+  # -- Require non-root user
+  runAsNonRoot: true
+  # -- Disallow privilege escalation
+  allowPrivilegeEscalation: false
+  # -- Mount root filesystem as read-only
+  readOnlyRootFilesystem: false
+  capabilities:
+    # -- Linux capabilities to drop
+    drop:
+      - ALL
+
+## Resource parameters
+resources:
+  limits:
+    # -- Memory limit
+    memory: 1Gi
+  requests:
+    # -- Memory request
+    memory: 512Mi
+
+## Startup probe parameters
+startupProbe:
+  # -- Enable startup probe
+  enabled: true
+  # -- HTTP path for startup check
+  path: /lib/health/start
+  # -- Port name or number for startup check
+  port: http
+  # -- Delay before first probe
+  initialDelaySeconds: 5
+  # -- Interval between probes
+  periodSeconds: 10
+  # -- Probe timeout
+  timeoutSeconds: 5
+  # -- Failures before marking unhealthy
+  failureThreshold: 30
+  # -- Successes before marking healthy
+  successThreshold: 1
+
+## Readiness probe parameters
+readinessProbe:
+  # -- Enable readiness probe
+  enabled: true
+  # -- HTTP path for readiness check
+  path: /lib/health/ready
+  # -- Port name or number for readiness check
+  port: http
+  # -- Delay before first probe
+  initialDelaySeconds: 5
+  # -- Interval between probes
+  periodSeconds: 10
+  # -- Probe timeout
+  timeoutSeconds: 5
+  # -- Failures before marking unready
+  failureThreshold: 3
+  # -- Successes before marking ready
+  successThreshold: 1
+
+## Liveness probe parameters
+livenessProbe:
+  # -- Enable liveness probe
+  enabled: true
+  # -- HTTP path for liveness check
+  path: /lib/health/ready
+  # -- Port name or number for liveness check
+  port: http
+  # -- Delay before first probe
+  initialDelaySeconds: 10
+  # -- Interval between probes
+  periodSeconds: 10
+  # -- Probe timeout
+  timeoutSeconds: 5
+  # -- Failures before restarting
+  failureThreshold: 6
+  # -- Successes before marking healthy
+  successThreshold: 1
+
+## Service parameters
 service:
-  ports:
-    - port: 4000
-      protocol: TCP
-      targetPort: 4000
-internalIngress:
-  enabled: false
-  whitelistSourceRange: ""
-db:
-  host: ""
-  name: ""
-  password: ""
-  port: "5432"
-  user: postgres
+  # -- Kubernetes service type
+  type: ClusterIP
+  # -- Service and container port
+  port: 4000
+
+## Ingress parameters
 ingress:
+  # -- Enable ingress
+  enabled: true
+  # -- Ingress class name
+  ingressClassName: nginx
+  # -- cert-manager ClusterIssuer name
+  certIssuer: cert-manager-global
+  # -- List of ingress hostnames
   hosts: []
-gcloudServiceKey:
+  # -- Additional ingress annotations (merged with chart defaults)
+  annotations: {}
+
+## Internal Ingress parameters
+internalIngress:
+  # -- Enable internal ingress with IP whitelisting
   enabled: false
+  # -- Comma-separated CIDR ranges allowed to access internal endpoints
+  whitelistSourceRange: ""
+
+## Headless Service parameters
+headlessService:
+  # -- Enable headless service for pod discovery
+  enabled: true
+
+## ConfigMap parameters
+configMap:
+  # -- Key-value pairs injected as environment variables via ConfigMap
+  env: {}
+
+## Secret parameters
+secret:
+  # -- Arbitrary key-value pairs rendered as a Kubernetes Secret (values are base64-encoded automatically)
+  data: {}
+
+## External Secrets parameters
 secretStore:
+  # -- Enable SecretStore and ServiceAccount for vault integration
   enabled: false
+  # -- SecretStore name
   name: ""
+  # -- Vault/OpenBao server URL
   server: ""
   auth:
+    # -- Kubernetes auth role for vault
     role: ""
+
+# -- List of ExternalSecret definitions
 externalSecrets: []
+
+## Extra parameters
+
+# -- Additional environment variables
+extraEnvVars: []
+# -- Additional volumes
+extraVolumes: []
+# -- Additional volume mounts
+extraVolumeMounts: []
+# -- Additional pod annotations
+podAnnotations: {}
+# -- Additional pod labels
+podLabels: {}

@@ -1,13 +1,11 @@
+{{- if .Values.configMap.env }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  namespace: {{ .Values.namespace }}
   name: {{ include "backend.fullname" . }}-backend
   labels:
-  {{- include "backend.labels" . | nindent 4 }}
+    {{- include "backend.labels" . | nindent 4 }}
 immutable: false
 data:
-  HEADLESS_SERVICE_NAME: {{ include "backend.fullname" . }}-backend-headless
-  {{- if .Values.configMap.env }}
-  {{- .Values.configMap.env | toYaml | nindent 2 }}
-  {{- end }}
+  {{- toYaml .Values.configMap.env | nindent 2 }}
+{{- end }}

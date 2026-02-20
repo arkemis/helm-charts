@@ -51,12 +51,16 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
-Create the name of the service account to use
+Return the proper image name.
+Constructs from image.registry, image.repository, and image.tag.
 */}}
-{{- define "frontend.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "frontend.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
+{{- define "frontend.image" -}}
+{{- $registry := .Values.image.registry -}}
+{{- $repository := .Values.image.repository -}}
+{{- $tag := .Values.image.tag | default .Chart.AppVersion -}}
+{{- if $registry -}}
+  {{- printf "%s/%s:%s" $registry $repository $tag -}}
+{{- else -}}
+  {{- printf "%s:%s" $repository $tag -}}
+{{- end -}}
 {{- end }}

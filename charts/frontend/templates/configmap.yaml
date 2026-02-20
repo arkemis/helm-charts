@@ -1,10 +1,11 @@
+{{- if .Values.configMap.env }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  namespace: {{ .Values.namespace }}
   name: {{ include "frontend.fullname" . }}-frontend
   labels:
-  {{- include "frontend.labels" . | nindent 4 }}
+    {{- include "frontend.labels" . | nindent 4 }}
 immutable: false
 data:
-  {{- .Values.configMap.env | toYaml | nindent 2 }}
+  {{- toYaml .Values.configMap.env | nindent 2 }}
+{{- end }}

@@ -1,0 +1,16 @@
+{{ template "chart.header" . }}
+
+{{ template "chart.description" . }}
+
+## Installation
+
+```bash
+helm repo add arkemis https://arkemis.github.io/helm-charts
+helm install my-frontend arkemis/frontend
+```
+
+{{ template "chart.requirementsSection" . }}
+
+{{ template "chart.valuesSection" . }}
+
+{{ template "chart.maintainersSection" . }}
