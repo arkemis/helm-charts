@@ -30,8 +30,12 @@ replicaCount: 1
 podSecurityContext:
   # -- Require non-root user
   runAsNonRoot: true
+  # -- User ID to run as
+  runAsUser: 65534
+  # -- Group ID to run as
+  runAsGroup: 65534
   # -- Group ID for filesystem access
-  fsGroup: 1001
+  fsGroup: 65534
 
 containerSecurityContext:
   # -- Require non-root user

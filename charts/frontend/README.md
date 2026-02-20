@@ -48,7 +48,9 @@ helm install my-frontend arkemis/frontend
 | podAnnotations | object | `{}` | Additional pod annotations |
 | podLabels | object | `{}` | Additional pod labels |
 | podSecurityContext.fsGroup | int | `1001` | Group ID for filesystem access |
+| podSecurityContext.runAsGroup | int | `1001` | Group ID to run as |
 | podSecurityContext.runAsNonRoot | bool | `true` | Require non-root user |
+| podSecurityContext.runAsUser | int | `1001` | User ID to run as |
 | readinessProbe.enabled | bool | `true` | Enable readiness probe |
 | readinessProbe.failureThreshold | int | `3` | Failures before marking unready |
 | readinessProbe.initialDelaySeconds | int | `5` | Delay before first probe |

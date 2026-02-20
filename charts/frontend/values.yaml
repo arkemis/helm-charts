@@ -30,6 +30,10 @@ replicaCount: 1
 podSecurityContext:
   # -- Require non-root user
   runAsNonRoot: true
+  # -- User ID to run as
+  runAsUser: 1001
+  # -- Group ID to run as
+  runAsGroup: 1001
   # -- Group ID for filesystem access
   fsGroup: 1001
 
