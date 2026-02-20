@@ -1,0 +1,5 @@
+pre-commit:
+  jobs:
+    - name: helm-docs
+      glob: "charts/*/values.yaml"
+      run: helm-docs --chart-search-root=charts && git add charts/*/README.md

@@ -1,7 +1,7 @@
+{{- if .Values.headlessService.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: {{ .Values.namespace }}
   name: {{ include "backend.fullname" . }}-backend-headless
   labels:
     {{- include "backend.labels" . | nindent 4 }}
@@ -11,4 +11,8 @@ spec:
   selector:
     {{- include "backend.selectorLabels" . | nindent 4 }}
   ports:
-    {{- .Values.service.ports | toYaml | nindent 2 }}
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.port }}
+      protocol: TCP
+      name: http
+{{- end }}

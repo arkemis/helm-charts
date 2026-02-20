@@ -1,36 +1,39 @@
+{{- if .Values.ingress.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  namespace: {{ .Values.namespace }}
   name: {{ include "frontend.fullname" . }}-frontend-0
   labels:
     {{- include "frontend.labels" . | nindent 4 }}
   annotations:
-    cert-manager.io/cluster-issuer: {{ .Values.certIssuer }}
+    {{- if .Values.ingress.certIssuer }}
+    cert-manager.io/cluster-issuer: {{ .Values.ingress.certIssuer }}
     cert-manager.io/issue-temporary-certificate: "true"
     cert-manager.io/private-key-rotation-policy: Always
+    {{- end }}
     external-dns.alpha.kubernetes.io/hostname: {{ .Values.ingress.hosts | join "," }}
-    nginx.ingress.kubernetes.io/proxy-buffer-size: 16k
-    nginx.ingress.kubernetes.io/proxy-buffering: "on"
-    nginx.ingress.kubernetes.io/proxy-buffers-number: "8"
+    {{- with .Values.ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
-  ingressClassName: nginx
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
   rules:
-  {{- range .Values.ingress.hosts }}
-  - host: {{ . }}
-    http:
-      paths:
-      - backend:
-          service:
-            name: {{ include "frontend.fullname" $ }}-frontend
-            port:
-              number: 3000
-        path: /
-        pathType: Prefix
-  {{- end }}
+    {{- range .Values.ingress.hosts }}
+    - host: {{ . }}
+      http:
+        paths:
+          - backend:
+              service:
+                name: {{ include "frontend.fullname" $ }}-frontend
+                port:
+                  number: {{ $.Values.service.port }}
+            path: /
+            pathType: Prefix
+    {{- end }}
   tls:
-  - hosts:
-  {{- range .Values.ingress.hosts }}
-    - {{ . }}
-  {{- end }}
-    secretName: {{ include "frontend.fullname" . }}-frontend-0-tls
+    - hosts:
+        {{- range .Values.ingress.hosts }}
+        - {{ . }}
+        {{- end }}
+      secretName: {{ include "frontend.fullname" . }}-frontend-0-tls
+{{- end }}
