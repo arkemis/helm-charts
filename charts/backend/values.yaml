@@ -125,17 +125,11 @@ ingress:
   # -- Ingress class name
   ingressClassName: nginx
   # -- cert-manager ClusterIssuer name
-  certIssuer: ""
+  certIssuer: cert-manager-global
   # -- List of ingress hostnames
   hosts: []
-  # -- Additional ingress annotations (merged with defaults)
-  annotations:
-    nginx.ingress.kubernetes.io/proxy-body-size: 15m
-    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "900"
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "900"
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
-    nginx.ingress.kubernetes.io/use-regex: "true"
+  # -- Additional ingress annotations (merged with chart defaults)
+  annotations: {}
 
 ## Internal Ingress parameters
 internalIngress:

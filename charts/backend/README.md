@@ -29,8 +29,8 @@ helm install my-backend arkemis/backend
 | image.registry | string | `"ghcr.io"` | Container image registry |
 | image.repository | string | `""` | Container image repository |
 | image.tag | string | `""` | Container image tag (defaults to chart appVersion) |
-| ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-body-size":"15m","nginx.ingress.kubernetes.io/proxy-connect-timeout":"60","nginx.ingress.kubernetes.io/proxy-read-timeout":"900","nginx.ingress.kubernetes.io/proxy-send-timeout":"900","nginx.ingress.kubernetes.io/rewrite-target":"/$1","nginx.ingress.kubernetes.io/use-regex":"true"}` | Additional ingress annotations (merged with defaults) |
-| ingress.certIssuer | string | `""` | cert-manager ClusterIssuer name |
+| ingress.annotations | object | `{}` | Additional ingress annotations (merged with chart defaults) |
+| ingress.certIssuer | string | `"cert-manager-global"` | cert-manager ClusterIssuer name |
 | ingress.enabled | bool | `true` | Enable ingress |
 | ingress.hosts | list | `[]` | List of ingress hostnames |
 | ingress.ingressClassName | string | `"nginx"` | Ingress class name |

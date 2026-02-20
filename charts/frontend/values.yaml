@@ -125,7 +125,7 @@ ingress:
   # -- Ingress class name
   ingressClassName: nginx
   # -- cert-manager ClusterIssuer name
-  certIssuer: ""
+  certIssuer: cert-manager-global
   # -- List of ingress hostnames
   hosts: []
   # -- Additional ingress annotations

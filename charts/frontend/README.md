@@ -29,7 +29,7 @@ helm install my-frontend arkemis/frontend
 | image.repository | string | `""` | Container image repository |
 | image.tag | string | `""` | Container image tag (defaults to chart appVersion) |
 | ingress.annotations | object | `{}` | Additional ingress annotations |
-| ingress.certIssuer | string | `""` | cert-manager ClusterIssuer name |
+| ingress.certIssuer | string | `"cert-manager-global"` | cert-manager ClusterIssuer name |
 | ingress.enabled | bool | `true` | Enable ingress |
 | ingress.hosts | list | `[]` | List of ingress hostnames |
 | ingress.ingressClassName | string | `"nginx"` | Ingress class name |
