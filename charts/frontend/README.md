@@ -58,8 +58,9 @@ helm install my-frontend arkemis/frontend
 | readinessProbe.successThreshold | int | `1` | Successes before marking ready |
 | readinessProbe.timeoutSeconds | int | `5` | Probe timeout |
 | replicaCount | int | `1` | Number of pod replicas |
-| resources.limits.memory | string | `"1Gi"` | Memory limit |
-| resources.requests.memory | string | `"512Mi"` | Memory request |
+| resources.limits.memory | string | `"256Mi"` | Memory limit |
+| resources.requests.cpu | string | `"5m"` | CPU request |
+| resources.requests.memory | string | `"128Mi"` | Memory request |
 | secretStore.auth.role | string | `""` | Kubernetes auth role for vault |
 | secretStore.enabled | bool | `false` | Enable SecretStore and ServiceAccount for vault integration |
 | secretStore.name | string | `""` | SecretStore name |

@@ -49,10 +49,12 @@ containerSecurityContext:
 resources:
   limits:
     # -- Memory limit
-    memory: 1Gi
-  requests:
-    # -- Memory request
     memory: 512Mi
+  requests:
+    # -- CPU request
+    cpu: 10m
+    # -- Memory request
+    memory: 256Mi
 
 ## Startup probe parameters
 startupProbe:

@@ -61,8 +61,9 @@ helm install my-backend arkemis/backend
 | readinessProbe.successThreshold | int | `1` | Successes before marking ready |
 | readinessProbe.timeoutSeconds | int | `5` | Probe timeout |
 | replicaCount | int | `1` | Number of pod replicas |
-| resources.limits.memory | string | `"1Gi"` | Memory limit |
-| resources.requests.memory | string | `"512Mi"` | Memory request |
+| resources.limits.memory | string | `"512Mi"` | Memory limit |
+| resources.requests.cpu | string | `"10m"` | CPU request |
+| resources.requests.memory | string | `"256Mi"` | Memory request |
 | secret.data | object | `{}` | Arbitrary key-value pairs rendered as a Kubernetes Secret (values are base64-encoded automatically) |
 | secretStore.auth.role | string | `""` | Kubernetes auth role for vault |
 | secretStore.enabled | bool | `false` | Enable SecretStore and ServiceAccount for vault integration |
