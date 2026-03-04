@@ -167,7 +167,7 @@ secretStore:
   name: ""
   # -- Vault/OpenBao server URL
   server: ""
-  # -- CA provider for TLS verification (type, name, namespace, key)
+  # -- CA provider for TLS verification (type, name, key)
   caProvider: {}
   auth:
     # -- Kubernetes auth role for vault

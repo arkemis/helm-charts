@@ -64,7 +64,7 @@ helm install my-frontend arkemis/frontend
 | resources.requests.cpu | string | `"5m"` | CPU request |
 | resources.requests.memory | string | `"128Mi"` | Memory request |
 | secretStore.auth.role | string | `""` | Kubernetes auth role for vault |
-| secretStore.caProvider | object | `{}` | CA provider for TLS verification (type, name, namespace, key) |
+| secretStore.caProvider | object | `{}` | CA provider for TLS verification (type, name, key) |
 | secretStore.enabled | bool | `false` | Enable SecretStore and ServiceAccount for vault integration |
 | secretStore.name | string | `""` | SecretStore name |
 | secretStore.server | string | `""` | Vault/OpenBao server URL |

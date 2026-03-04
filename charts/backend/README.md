@@ -68,7 +68,7 @@ helm install my-backend arkemis/backend
 | resources.requests.memory | string | `"256Mi"` | Memory request |
 | secret.data | object | `{}` | Arbitrary key-value pairs rendered as a Kubernetes Secret (values are base64-encoded automatically) |
 | secretStore.auth.role | string | `""` | Kubernetes auth role for vault |
-| secretStore.caProvider | object | `{}` | CA provider for TLS verification (type, name, namespace, key) |
+| secretStore.caProvider | object | `{}` | CA provider for TLS verification (type, name, key) |
 | secretStore.enabled | bool | `false` | Enable SecretStore and ServiceAccount for vault integration |
 | secretStore.name | string | `""` | SecretStore name |
 | secretStore.server | string | `""` | Vault/OpenBao server URL |
