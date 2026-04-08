@@ -5,8 +5,10 @@ nameOverride: ""
 # -- Override the fully qualified app name
 fullnameOverride: ""
 
-# -- Namespace to deploy resources into (also creates the namespace if set)
+# -- Namespace to deploy resources into
 namespace: ""
+# -- Whether to create the namespace resource
+createNamespace: false
 # -- Labels to apply to the created namespace
 namespaceLabels: {}
 

@@ -18,6 +18,7 @@ helm install my-backend arkemis/backend
 | containerSecurityContext.capabilities.drop | list | `["ALL"]` | Linux capabilities to drop |
 | containerSecurityContext.readOnlyRootFilesystem | bool | `true` | Mount root filesystem as read-only |
 | containerSecurityContext.runAsNonRoot | bool | `true` | Require non-root user |
+| createNamespace | bool | `false` | Whether to create the namespace resource |
 | externalSecrets | list | `[]` | List of ExternalSecret definitions |
 | extraEnvVars | list | `[]` | Additional environment variables |
 | extraVolumeMounts | list | `[]` | Additional volume mounts |
@@ -46,7 +47,7 @@ helm install my-backend arkemis/backend
 | livenessProbe.successThreshold | int | `1` | Successes before marking healthy |
 | livenessProbe.timeoutSeconds | int | `5` | Probe timeout |
 | nameOverride | string | `""` | Override the chart name |
-| namespace | string | `""` | Namespace to deploy resources into (also creates the namespace if set) |
+| namespace | string | `""` | Namespace to deploy resources into |
 | namespaceLabels | object | `{}` | Labels to apply to the created namespace |
 | podAnnotations | object | `{}` | Additional pod annotations |
 | podLabels | object | `{}` | Additional pod labels |
