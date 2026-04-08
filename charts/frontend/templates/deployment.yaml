@@ -30,7 +30,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      automountServiceAccountToken: false
+      automountServiceAccountToken: {{ .Values.secretStore.enabled }}
       {{- with .Values.image.pullSecrets }}
       imagePullSecrets:
         {{- range . }}
@@ -49,11 +49,18 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
-          {{- if .Values.configMap.env }}
+          {{- if or .Values.configMap.env .Values.secret.data .Values.externalSecrets }}
           envFrom:
+            {{- if .Values.configMap.env }}
             - configMapRef:
                 name: {{ include "frontend.fullname" . }}-frontend
                 optional: false
+            {{- end }}
+            {{- if or .Values.secret.data .Values.externalSecrets }}
+            - secretRef:
+                name: {{ include "frontend.fullname" . }}-secret
+                optional: false
+            {{- end }}
           {{- end }}
           {{- with .Values.extraEnvVars }}
           env:

@@ -63,6 +63,7 @@ helm install my-frontend arkemis/frontend
 | resources.limits.memory | string | `"256Mi"` | Memory limit |
 | resources.requests.cpu | string | `"5m"` | CPU request |
 | resources.requests.memory | string | `"128Mi"` | Memory request |
+| secret.data | object | `{}` | Arbitrary key-value pairs rendered as a Kubernetes Secret (values are base64-encoded automatically) |
 | secretStore.auth.role | string | `""` | Kubernetes auth role for vault |
 | secretStore.caProvider | object | `{}` | CA provider for TLS verification (type, name, key) |
 | secretStore.enabled | bool | `false` | Enable SecretStore and ServiceAccount for vault integration |

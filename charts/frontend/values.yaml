@@ -142,6 +142,11 @@ configMap:
   # -- Key-value pairs injected as environment variables via ConfigMap
   env: {}
 
+## Secret parameters
+secret:
+  # -- Arbitrary key-value pairs rendered as a Kubernetes Secret (values are base64-encoded automatically)
+  data: {}
+
 ## External Secrets parameters
 secretStore:
   # -- Enable SecretStore and ServiceAccount for vault integration
