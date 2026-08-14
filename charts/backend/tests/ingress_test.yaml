@@ -1,0 +1,42 @@
+suite: backend ingress (deprecated)
+release:
+  name: my
+templates:
+  - ingress.yaml
+  - internal-ingress.yaml
+tests:
+  - it: still renders the public ingress by default
+    template: ingress.yaml
+    set:
+      ingress.hosts:
+        - api.example.com
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Ingress
+      - equal:
+          path: spec.rules[0].http.paths[0].path
+          value: /api/(?P<capture>.+)
+      - isSubset:
+          path: metadata.annotations
+          content:
+            nginx.ingress.kubernetes.io/rewrite-target: /$capture
+
+  - it: still renders the internal ingress with the source-range whitelist
+    template: internal-ingress.yaml
+    set:
+      ingress.hosts:
+        - api.example.com
+      internalIngress.enabled: true
+      internalIngress.whitelistSourceRange: 10.224.0.0/14
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.rules[0].http.paths[0].path
+          value: /api/internal/(?P<capture>.+)
+      - isSubset:
+          path: metadata.annotations
+          content:
+            nginx.ingress.kubernetes.io/whitelist-source-range: 10.224.0.0/14

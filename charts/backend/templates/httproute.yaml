@@ -1,0 +1,73 @@
+{{- if .Values.gateway.enabled }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ include "backend.fullname" . }}-backend
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
+  {{- with .Values.gateway.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  parentRefs:
+    {{- range .Values.gateway.parentRefs }}
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: {{ .name }}
+      {{- with .namespace }}
+      namespace: {{ . }}
+      {{- end }}
+      {{- with .sectionName }}
+      sectionName: {{ . }}
+      {{- end }}
+    {{- end }}
+  {{- with .Values.gateway.hostnames }}
+  hostnames:
+    {{- range . }}
+    - {{ . | quote }}
+    {{- end }}
+  {{- end }}
+  rules:
+    {{- if .Values.gateway.internal.enabled }}
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api/internal
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /internal
+        - type: ExtensionRef
+          extensionRef:
+            group: gateway.nginx.org
+            kind: SnippetsFilter
+            name: {{ include "backend.fullname" . }}-backend-internal
+      backendRefs:
+        - name: {{ include "backend.fullname" . }}-backend
+          port: {{ .Values.service.port }}
+      {{- with .Values.gateway.timeouts }}
+      timeouts:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- end }}
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: {{ include "backend.fullname" . }}-backend
+          port: {{ .Values.service.port }}
+      {{- with .Values.gateway.timeouts }}
+      timeouts:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

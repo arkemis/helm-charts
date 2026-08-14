@@ -9,6 +9,40 @@ helm repo add arkemis https://arkemis.github.io/helm-charts
 helm install my-frontend arkemis/frontend
 ```
 
+## Routing
+
+Traffic is exposed either through Gateway API (`gateway.*`, NGINX Gateway Fabric) or through the
+**deprecated** Ingress (`ingress.*`). Ready-made values files live in [`examples/`](examples).
+
+```bash
+helm install my-frontend arkemis/frontend -f examples/gateway-values.yaml
+```
+
+### Prerequisites for `gateway.enabled`
+
+- Gateway API CRDs and [NGINX Gateway Fabric](https://docs.nginx.com/nginx-gateway-fabric/) installed
+  in the cluster.
+- A `Gateway` — **not** created by this chart — with an HTTPS listener whose `hostname` covers
+  `gateway.hostnames`, and whose TLS certificate is issued there. The chart renders only the
+  `HTTPRoute`; it no longer requests a certificate.
+- external-dns configured with the `gateway-httproute` source if DNS records should follow the route
+  (hostnames are read from `HTTPRoute.spec.hostnames`, not from an annotation).
+
+### Migrating from Ingress
+
+`ingress.*` still works and is unchanged, but is deprecated. Both paths may run side by side during
+the cutover — they render separate resources and do not conflict — so enable `gateway`, verify
+traffic, then set `ingress.enabled: false`.
+
+| Deprecated Ingress setting | Gateway API equivalent |
+| -------------------------- | ---------------------- |
+| `ingress.enabled` | `gateway.enabled` |
+| `ingress.hosts` | `gateway.hostnames` |
+| `ingress.ingressClassName` | `gateway.parentRefs` (the Gateway selects the controller) |
+| `ingress.certIssuer` | none — the Gateway listener owns TLS |
+| `nginx.ingress.kubernetes.io/proxy-body-size` | `gateway.clientSettings.maxBodySize` (NGF `ClientSettingsPolicy`) |
+| `nginx.ingress.kubernetes.io/proxy-read-timeout`, `proxy-send-timeout` | `gateway.timeouts.request`, `gateway.timeouts.backendRequest` |
+
 ## Values
 
 | Key | Type | Default | Description |
@@ -24,16 +58,24 @@ helm install my-frontend arkemis/frontend
 | extraVolumeMounts | list | `[]` | Additional volume mounts |
 | extraVolumes | list | `[]` | Additional volumes |
 | fullnameOverride | string | `""` | Override the fully qualified app name |
+| gateway.annotations | object | `{}` | Additional HTTPRoute annotations |
+| gateway.clientSettings.bodyTimeout | string | `"60s"` | Client request body read timeout |
+| gateway.clientSettings.enabled | bool | `true` | Enable the NGF ClientSettingsPolicy targeting the HTTPRoute |
+| gateway.clientSettings.maxBodySize | string | `"15m"` | Maximum client request body size |
+| gateway.enabled | bool | `false` | Enable HTTPRoute (Gateway API). Replaces the deprecated `ingress` |
+| gateway.hostnames | list | `[]` | List of hostnames served by the HTTPRoute (empty matches every hostname of the Gateway listener) |
+| gateway.parentRefs | list | `[{"name":"nginx","namespace":"nginx-gateway","sectionName":"https"}]` | Gateways to attach the HTTPRoute to (name, namespace, sectionName). The Gateway itself, its TLS listener and its certificate are not managed by this chart |
+| gateway.timeouts | object | `{"backendRequest":"900s","request":"900s"}` | Per-rule HTTPRoute timeouts (`request`, `backendRequest`); set to `null` to use NGINX defaults |
 | image.pullPolicy | string | `"Always"` | Image pull policy |
 | image.pullSecrets | list | `[]` | List of image pull secret names |
 | image.registry | string | `"ghcr.io"` | Container image registry |
 | image.repository | string | `""` | Container image repository |
 | image.tag | string | `""` | Container image tag (defaults to chart appVersion) |
-| ingress.annotations | object | `{}` | Additional ingress annotations |
-| ingress.certIssuer | string | `"cert-manager-global"` | cert-manager ClusterIssuer name |
-| ingress.enabled | bool | `true` | Enable ingress |
-| ingress.hosts | list | `[]` | List of ingress hostnames |
-| ingress.ingressClassName | string | `"nginx"` | Ingress class name |
+| ingress.annotations | object | `{}` | DEPRECATED (use `gateway.annotations`): Additional ingress annotations |
+| ingress.certIssuer | string | `"cert-manager-global"` | DEPRECATED (the Gateway listener owns TLS): cert-manager ClusterIssuer name |
+| ingress.enabled | bool | `true` | DEPRECATED (use `gateway.enabled`): Enable ingress |
+| ingress.hosts | list | `[]` | DEPRECATED (use `gateway.hostnames`): List of ingress hostnames |
+| ingress.ingressClassName | string | `"nginx"` | DEPRECATED (use `gateway.parentRefs`): Ingress class name |
 | kubernetesClusterDomain | string | `"cluster.local"` | Kubernetes cluster domain |
 | livenessProbe.enabled | bool | `true` | Enable liveness probe |
 | livenessProbe.failureThreshold | int | `6` | Failures before restarting |

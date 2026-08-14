@@ -1,0 +1,103 @@
+suite: backend httproute
+release:
+  name: my
+templates:
+  - httproute.yaml
+tests:
+  - it: renders nothing unless gateway.enabled
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: attaches to the configured gateway and service
+    set:
+      gateway.enabled: true
+      gateway.hostnames:
+        - api.example.com
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: HTTPRoute
+      - isAPIVersion:
+          of: gateway.networking.k8s.io/v1
+      - equal:
+          path: metadata.name
+          value: my-backend-backend
+      - equal:
+          path: spec.parentRefs[0]
+          value:
+            group: gateway.networking.k8s.io
+            kind: Gateway
+            name: nginx
+            namespace: nginx-gateway
+            sectionName: https
+      - equal:
+          path: spec.hostnames[0]
+          value: api.example.com
+      - equal:
+          path: spec.rules[0].backendRefs[0]
+          value:
+            name: my-backend-backend
+            port: 4000
+      - equal:
+          path: spec.rules[0].timeouts.request
+          value: 900s
+
+  - it: rewrites /api to / like the deprecated ingress rewrite-target
+    set:
+      gateway.enabled: true
+    asserts:
+      - lengthEqual:
+          path: spec.rules
+          count: 1
+      - equal:
+          path: spec.rules[0].matches[0].path
+          value:
+            type: PathPrefix
+            value: /api
+      - equal:
+          path: spec.rules[0].filters[0].urlRewrite.path
+          value:
+            type: ReplacePrefixMatch
+            replacePrefixMatch: /
+      - lengthEqual:
+          path: spec.rules[0].filters
+          count: 1
+
+  - it: adds the allowlisted internal rule when gateway.internal.enabled
+    set:
+      gateway.enabled: true
+      gateway.internal.enabled: true
+      gateway.internal.allowedCidrs:
+        - 10.224.0.0/14
+    asserts:
+      - lengthEqual:
+          path: spec.rules
+          count: 2
+      - equal:
+          path: spec.rules[0].matches[0].path.value
+          value: /api/internal
+      - equal:
+          path: spec.rules[0].filters[0].urlRewrite.path.replacePrefixMatch
+          value: /internal
+      # Must match the name in snippets-filter.yaml, or NGF drops the route
+      - equal:
+          path: spec.rules[0].filters[1].extensionRef
+          value:
+            group: gateway.nginx.org
+            kind: SnippetsFilter
+            name: my-backend-backend-internal
+      - equal:
+          path: spec.rules[1].matches[0].path.value
+          value: /api
+
+  - it: omits hostnames when unset and timeouts when nulled
+    set:
+      gateway.enabled: true
+      gateway.timeouts: null
+    asserts:
+      - isNull:
+          path: spec.hostnames
+      - isNull:
+          path: spec.rules[0].timeouts

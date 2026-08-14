@@ -9,6 +9,40 @@ helm repo add arkemis https://arkemis.github.io/helm-charts
 helm install my-frontend arkemis/frontend
 ```
 
+## Routing
+
+Traffic is exposed either through Gateway API (`gateway.*`, NGINX Gateway Fabric) or through the
+**deprecated** Ingress (`ingress.*`). Ready-made values files live in [`examples/`](examples).
+
+```bash
+helm install my-frontend arkemis/frontend -f examples/gateway-values.yaml
+```
+
+### Prerequisites for `gateway.enabled`
+
+- Gateway API CRDs and [NGINX Gateway Fabric](https://docs.nginx.com/nginx-gateway-fabric/) installed
+  in the cluster.
+- A `Gateway` — **not** created by this chart — with an HTTPS listener whose `hostname` covers
+  `gateway.hostnames`, and whose TLS certificate is issued there. The chart renders only the
+  `HTTPRoute`; it no longer requests a certificate.
+- external-dns configured with the `gateway-httproute` source if DNS records should follow the route
+  (hostnames are read from `HTTPRoute.spec.hostnames`, not from an annotation).
+
+### Migrating from Ingress
+
+`ingress.*` still works and is unchanged, but is deprecated. Both paths may run side by side during
+the cutover — they render separate resources and do not conflict — so enable `gateway`, verify
+traffic, then set `ingress.enabled: false`.
+
+| Deprecated Ingress setting | Gateway API equivalent |
+| -------------------------- | ---------------------- |
+| `ingress.enabled` | `gateway.enabled` |
+| `ingress.hosts` | `gateway.hostnames` |
+| `ingress.ingressClassName` | `gateway.parentRefs` (the Gateway selects the controller) |
+| `ingress.certIssuer` | none — the Gateway listener owns TLS |
+| `nginx.ingress.kubernetes.io/proxy-body-size` | `gateway.clientSettings.maxBodySize` (NGF `ClientSettingsPolicy`) |
+| `nginx.ingress.kubernetes.io/proxy-read-timeout`, `proxy-send-timeout` | `gateway.timeouts.request`, `gateway.timeouts.backendRequest` |
+
 {{ template "chart.requirementsSection" . }}
 
 {{ template "chart.valuesSection" . }}

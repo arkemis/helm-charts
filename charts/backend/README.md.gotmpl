@@ -9,6 +9,45 @@ helm repo add arkemis https://arkemis.github.io/helm-charts
 helm install my-backend arkemis/backend
 ```
 
+## Routing
+
+Traffic is exposed either through Gateway API (`gateway.*`, NGINX Gateway Fabric) or through the
+**deprecated** Ingress (`ingress.*`, `internalIngress.*`). Ready-made values files live in
+[`examples/`](examples).
+
+```bash
+helm install my-backend arkemis/backend -f examples/gateway-values.yaml
+```
+
+### Prerequisites for `gateway.enabled`
+
+- Gateway API CRDs and [NGINX Gateway Fabric](https://docs.nginx.com/nginx-gateway-fabric/) installed
+  in the cluster.
+- A `Gateway` — **not** created by this chart — with an HTTPS listener whose `hostname` covers
+  `gateway.hostnames`, and whose TLS certificate is issued there. The chart renders only the
+  `HTTPRoute`; it no longer requests a certificate.
+- external-dns configured with the `gateway-httproute` source if DNS records should follow the route
+  (hostnames are read from `HTTPRoute.spec.hostnames`, not from an annotation).
+- NGF snippets filters enabled (`--set nginxGateway.snippetsFilters.enable=true`) only if
+  `gateway.internal.enabled` is used.
+
+### Migrating from Ingress
+
+`ingress.*` and `internalIngress.*` still work and are unchanged, but are deprecated. Both paths may
+run side by side during the cutover — they render separate resources and do not conflict — so enable
+`gateway`, verify traffic, then set `ingress.enabled: false`.
+
+| Deprecated Ingress setting | Gateway API equivalent |
+| -------------------------- | ---------------------- |
+| `ingress.enabled` | `gateway.enabled` |
+| `ingress.hosts` | `gateway.hostnames` |
+| `ingress.ingressClassName` | `gateway.parentRefs` (the Gateway selects the controller) |
+| `ingress.certIssuer` | none — the Gateway listener owns TLS |
+| `internalIngress.whitelistSourceRange` (comma-separated string) | `gateway.internal.allowedCidrs` (list), rendered as an NGF `SnippetsFilter` |
+| `nginx.ingress.kubernetes.io/rewrite-target` | `URLRewrite` filter on the `HTTPRoute` rule (`/api` → `/`, `/api/internal` → `/internal`) |
+| `nginx.ingress.kubernetes.io/proxy-body-size` | `gateway.clientSettings.maxBodySize` (NGF `ClientSettingsPolicy`) |
+| `nginx.ingress.kubernetes.io/proxy-read-timeout`, `proxy-send-timeout` | `gateway.timeouts.request`, `gateway.timeouts.backendRequest` |
+
 {{ template "chart.requirementsSection" . }}
 
 {{ template "chart.valuesSection" . }}
