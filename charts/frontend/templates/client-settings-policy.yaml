@@ -1,0 +1,16 @@
+{{- if and .Values.gateway.enabled .Values.gateway.clientSettings.enabled }}
+apiVersion: gateway.nginx.org/v1alpha1
+kind: ClientSettingsPolicy
+metadata:
+  name: {{ include "frontend.fullname" . }}-frontend
+  labels:
+    {{- include "frontend.labels" . | nindent 4 }}
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: {{ include "frontend.fullname" . }}-frontend
+  body:
+    maxSize: {{ .Values.gateway.clientSettings.maxBodySize | quote }}
+    timeout: {{ .Values.gateway.clientSettings.bodyTimeout | quote }}
+{{- end }}

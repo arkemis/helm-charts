@@ -1,0 +1,47 @@
+suite: backend snippets filter
+release:
+  name: my
+templates:
+  - snippets-filter.yaml
+tests:
+  - it: renders nothing unless gateway.internal.enabled
+    set:
+      gateway.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: allows the listed cidrs and denies everything else
+    set:
+      gateway.enabled: true
+      gateway.internal.enabled: true
+      gateway.internal.allowedCidrs:
+        - 10.224.0.0/14
+        - 10.0.0.0/8
+    asserts:
+      - isKind:
+          of: SnippetsFilter
+      - isAPIVersion:
+          of: gateway.nginx.org/v1alpha1
+      - equal:
+          path: metadata.name
+          value: my-backend-backend-internal
+      - equal:
+          path: spec.snippets[0].context
+          value: http.server.location
+      - equal:
+          path: spec.snippets[0].value
+          value: |
+            allow 10.224.0.0/14;
+            allow 10.0.0.0/8;
+            deny all;
+
+  - it: denies everything when no cidr is listed
+    set:
+      gateway.enabled: true
+      gateway.internal.enabled: true
+    asserts:
+      - equal:
+          path: spec.snippets[0].value
+          value: |
+            deny all;

@@ -1,0 +1,16 @@
+{{- if and .Values.gateway.enabled .Values.gateway.internal.enabled }}
+apiVersion: gateway.nginx.org/v1alpha1
+kind: SnippetsFilter
+metadata:
+  name: {{ include "backend.fullname" . }}-backend-internal
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
+spec:
+  snippets:
+    - context: http.server.location
+      value: |
+        {{- range .Values.gateway.internal.allowedCidrs }}
+        allow {{ . }};
+        {{- end }}
+        deny all;
+{{- end }}

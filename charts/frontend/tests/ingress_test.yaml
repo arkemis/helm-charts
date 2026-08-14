@@ -1,0 +1,24 @@
+suite: frontend ingress (deprecated)
+release:
+  name: my
+templates:
+  - ingress.yaml
+tests:
+  - it: still renders by default
+    set:
+      ingress.hosts:
+        - app.example.com
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Ingress
+      - equal:
+          path: spec.ingressClassName
+          value: nginx
+      - equal:
+          path: spec.rules[0].http.paths[0].path
+          value: /
+      - equal:
+          path: spec.tls[0].hosts[0]
+          value: app.example.com

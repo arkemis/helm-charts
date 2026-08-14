@@ -126,25 +126,55 @@ service:
   # -- Service and container port
   port: 4000
 
-## Ingress parameters
+## Ingress parameters (DEPRECATED — use `gateway`)
 ingress:
-  # -- Enable ingress
+  # -- DEPRECATED (use `gateway.enabled`): Enable ingress
   enabled: true
-  # -- Ingress class name
+  # -- DEPRECATED (use `gateway.parentRefs`): Ingress class name
   ingressClassName: nginx
-  # -- cert-manager ClusterIssuer name
+  # -- DEPRECATED (the Gateway listener owns TLS): cert-manager ClusterIssuer name
   certIssuer: cert-manager-global
-  # -- List of ingress hostnames
+  # -- DEPRECATED (use `gateway.hostnames`): List of ingress hostnames
   hosts: []
-  # -- Additional ingress annotations (merged with chart defaults)
+  # -- DEPRECATED (use `gateway.annotations`): Additional ingress annotations (merged with chart defaults)
   annotations: {}
 
-## Internal Ingress parameters
+## Internal Ingress parameters (DEPRECATED — use `gateway.internal`)
 internalIngress:
-  # -- Enable internal ingress with IP whitelisting
+  # -- DEPRECATED (use `gateway.internal.enabled`): Enable internal ingress with IP whitelisting
   enabled: false
-  # -- Comma-separated CIDR ranges allowed to access internal endpoints
+  # -- DEPRECATED (use `gateway.internal.allowedCidrs`): Comma-separated CIDR ranges allowed to access internal endpoints
   whitelistSourceRange: ""
+
+## Gateway API parameters (NGINX Gateway Fabric)
+gateway:
+  # -- Enable HTTPRoute (Gateway API). Replaces the deprecated `ingress`
+  enabled: false
+  # -- Gateways to attach the HTTPRoute to (name, namespace, sectionName). The Gateway itself, its TLS listener and its certificate are not managed by this chart
+  parentRefs:
+    - name: nginx
+      namespace: nginx-gateway
+      sectionName: https
+  # -- List of hostnames served by the HTTPRoute (empty matches every hostname of the Gateway listener)
+  hostnames: []
+  # -- Additional HTTPRoute annotations
+  annotations: {}
+  # -- Per-rule HTTPRoute timeouts (`request`, `backendRequest`); set to `null` to use NGINX defaults
+  timeouts:
+    request: 900s
+    backendRequest: 900s
+  internal:
+    # -- Enable the `/api/internal` route restricted by an NGF SnippetsFilter IP allowlist. Requires NGF installed with snippets filters enabled
+    enabled: false
+    # -- CIDR ranges allowed to reach `/api/internal`. Empty means deny all
+    allowedCidrs: []
+  clientSettings:
+    # -- Enable the NGF ClientSettingsPolicy targeting the HTTPRoute
+    enabled: true
+    # -- Maximum client request body size
+    maxBodySize: 15m
+    # -- Client request body read timeout
+    bodyTimeout: 60s
 
 ## Headless Service parameters
 headlessService:

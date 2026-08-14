@@ -1,0 +1,39 @@
+suite: backend client settings policy
+release:
+  name: my
+templates:
+  - client-settings-policy.yaml
+tests:
+  - it: renders nothing unless gateway.enabled
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: targets the httproute and keeps the ingress body limit
+    set:
+      gateway.enabled: true
+    asserts:
+      - isKind:
+          of: ClientSettingsPolicy
+      - isAPIVersion:
+          of: gateway.nginx.org/v1alpha1
+      - equal:
+          path: spec.targetRef
+          value:
+            group: gateway.networking.k8s.io
+            kind: HTTPRoute
+            name: my-backend-backend
+      - equal:
+          path: spec.body.maxSize
+          value: 15m
+      - equal:
+          path: spec.body.timeout
+          value: 60s
+
+  - it: can be disabled
+    set:
+      gateway.enabled: true
+      gateway.clientSettings.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
