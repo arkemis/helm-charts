@@ -191,6 +191,13 @@ secret:
   # -- Arbitrary key-value pairs rendered as a Kubernetes Secret (values are base64-encoded automatically)
   data: {}
 
+## ServiceAccount parameters
+serviceAccount:
+  # -- Name of an existing ServiceAccount to run the pod as. Empty uses the namespace default. The ServiceAccount is not created here: GKE Workload Identity needs it annotated with a Google service account email that only the infrastructure layer knows
+  name: ""
+  # -- Mount the ServiceAccount token into the pod. Required by GKE Workload Identity
+  automount: false
+
 ## External Secrets parameters
 secretStore:
   # -- Enable SecretStore and ServiceAccount for vault integration

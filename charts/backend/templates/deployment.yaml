@@ -30,7 +30,10 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      automountServiceAccountToken: {{ .Values.secretStore.enabled }}
+      {{- with .Values.serviceAccount.name }}
+      serviceAccountName: {{ . }}
+      {{- end }}
+      automountServiceAccountToken: {{ or .Values.serviceAccount.automount .Values.secretStore.enabled }}
       {{- with .Values.image.pullSecrets }}
       imagePullSecrets:
         {{- range . }}

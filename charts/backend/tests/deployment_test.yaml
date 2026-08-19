@@ -1,0 +1,37 @@
+suite: backend deployment service account
+release:
+  name: my
+templates:
+  - deployment.yaml
+tests:
+  - it: runs as the namespace default with no token by default
+    asserts:
+      - notExists:
+          path: spec.template.spec.serviceAccountName
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: false
+
+  - it: runs as the named service account
+    set:
+      serviceAccount.name: phylo-dev-app
+    asserts:
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: phylo-dev-app
+
+  - it: mounts the token when asked, which is what Workload Identity needs
+    set:
+      serviceAccount.automount: true
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: true
+
+  - it: keeps mounting the token for secret store users
+    set:
+      secretStore.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: true
