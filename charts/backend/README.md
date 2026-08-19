@@ -124,6 +124,8 @@ run side by side during the cutover — they render separate resources and do no
 | secretStore.server | string | `""` | Vault/OpenBao server URL |
 | service.port | int | `4000` | Service and container port |
 | service.type | string | `"ClusterIP"` | Kubernetes service type |
+| serviceAccount.automount | bool | `false` | Mount the ServiceAccount token into the pod. Required by GKE Workload Identity |
+| serviceAccount.name | string | `""` | Name of an existing ServiceAccount to run the pod as. Empty uses the namespace default. The ServiceAccount is not created here: GKE Workload Identity needs it annotated with a Google service account email that only the infrastructure layer knows |
 | startupProbe.enabled | bool | `true` | Enable startup probe |
 | startupProbe.failureThreshold | int | `30` | Failures before marking unhealthy |
 | startupProbe.initialDelaySeconds | int | `5` | Delay before first probe |
