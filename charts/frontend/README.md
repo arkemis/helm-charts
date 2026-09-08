@@ -68,6 +68,7 @@ traffic, then set `ingress.enabled: false`.
 | gateway.timeouts | object | `{"backendRequest":"900s","request":"900s"}` | Per-rule HTTPRoute timeouts (`request`, `backendRequest`); set to `null` to use NGINX defaults |
 | image.pullPolicy | string | `"Always"` | Image pull policy |
 | image.pullSecrets | list | `[]` | List of image pull secret names |
+| image.digest | string | `""` | Container image digest (takes precedence over tag) |
 | image.registry | string | `"ghcr.io"` | Container image registry |
 | image.repository | string | `""` | Container image repository |
 | image.tag | string | `""` | Container image tag (defaults to chart appVersion) |

@@ -1,0 +1,26 @@
+suite: frontend deployment image
+release:
+  name: my
+templates:
+  - deployment.yaml
+tests:
+  - it: uses an image digest when configured
+    set:
+      image.registry: registry.example.com
+      image.repository: arkemis/frontend
+      image.tag: v1.2.3
+      image.digest: sha256:0123456789abcdef
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: registry.example.com/arkemis/frontend@sha256:0123456789abcdef
+
+  - it: keeps using the image tag by default
+    set:
+      image.registry: registry.example.com
+      image.repository: arkemis/frontend
+      image.tag: v1.2.3
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: registry.example.com/arkemis/frontend:v1.2.3
