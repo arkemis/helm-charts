@@ -76,6 +76,7 @@ run side by side during the cutover — they render separate resources and do no
 | headlessService.enabled | bool | `true` | Enable headless service for pod discovery |
 | image.pullPolicy | string | `"Always"` | Image pull policy |
 | image.pullSecrets | list | `[]` | List of image pull secret names |
+| image.digest | string | `""` | Container image digest (takes precedence over tag) |
 | image.registry | string | `"ghcr.io"` | Container image registry |
 | image.repository | string | `""` | Container image repository |
 | image.tag | string | `""` | Container image tag (defaults to chart appVersion) |

@@ -18,6 +18,8 @@ image:
   registry: ghcr.io
   # -- Container image repository
   repository: ""
+  # -- Container image digest (takes precedence over tag)
+  digest: ""
   # -- Container image tag (defaults to chart appVersion)
   tag: ""
   # -- Image pull policy

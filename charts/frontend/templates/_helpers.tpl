@@ -52,15 +52,20 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 
 {{/*
 Return the proper image name.
-Constructs from image.registry, image.repository, and image.tag.
+Constructs from image.registry, image.repository, and image.tag or image.digest.
 */}}
 {{- define "frontend.image" -}}
 {{- $registry := .Values.image.registry -}}
 {{- $repository := .Values.image.repository -}}
 {{- $tag := .Values.image.tag | default .Chart.AppVersion -}}
+{{- $digest := .Values.image.digest -}}
+{{- $image := $repository -}}
 {{- if $registry -}}
-  {{- printf "%s/%s:%s" $registry $repository $tag -}}
+  {{- $image = printf "%s/%s" $registry $repository -}}
+{{- end -}}
+{{- if $digest -}}
+  {{- printf "%s@%s" $image $digest -}}
 {{- else -}}
-  {{- printf "%s:%s" $repository $tag -}}
+  {{- printf "%s:%s" $image $tag -}}
 {{- end -}}
 {{- end }}

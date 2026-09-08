@@ -4,6 +4,27 @@ release:
 templates:
   - deployment.yaml
 tests:
+  - it: uses an image digest when configured
+    set:
+      image.registry: registry.example.com
+      image.repository: arkemis/backend
+      image.tag: v1.2.3
+      image.digest: sha256:0123456789abcdef
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: registry.example.com/arkemis/backend@sha256:0123456789abcdef
+
+  - it: keeps using the image tag by default
+    set:
+      image.registry: registry.example.com
+      image.repository: arkemis/backend
+      image.tag: v1.2.3
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: registry.example.com/arkemis/backend:v1.2.3
+
   - it: runs as the namespace default with no token by default
     asserts:
       - notExists:
