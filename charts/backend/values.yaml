@@ -152,7 +152,7 @@ internalIngress:
 gateway:
   # -- Enable HTTPRoute (Gateway API). Replaces the deprecated `ingress`
   enabled: false
-  # -- Gateways to attach the HTTPRoute to (name, namespace, sectionName). The Gateway itself, its TLS listener and its certificate are not managed by this chart
+  # -- Parents the HTTPRoute attaches to. Each entry takes `name` plus optional `group`/`kind` (default `Gateway`; set `kind: ListenerSet` to attach to a ListenerSet), `namespace` and `sectionName`. The parent, its TLS listener and its certificate are not managed by this chart
   parentRefs:
     - name: nginx
       namespace: nginx-gateway

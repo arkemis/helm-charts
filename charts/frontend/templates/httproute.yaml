@@ -12,8 +12,8 @@ metadata:
 spec:
   parentRefs:
     {{- range .Values.gateway.parentRefs }}
-    - group: gateway.networking.k8s.io
-      kind: Gateway
+    - group: {{ .group | default "gateway.networking.k8s.io" }}
+      kind: {{ .kind | default "Gateway" }}
       name: {{ .name }}
       {{- with .namespace }}
       namespace: {{ . }}

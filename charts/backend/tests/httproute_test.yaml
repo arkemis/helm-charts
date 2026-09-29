@@ -44,6 +44,23 @@ tests:
           path: spec.rules[0].timeouts.request
           value: 900s
 
+  - it: attaches to a ListenerSet when kind is overridden
+    set:
+      gateway.enabled: true
+      gateway.parentRefs:
+        - group: gateway.networking.k8s.io
+          kind: ListenerSet
+          name: my-listenerset
+          sectionName: https
+    asserts:
+      - equal:
+          path: spec.parentRefs[0]
+          value:
+            group: gateway.networking.k8s.io
+            kind: ListenerSet
+            name: my-listenerset
+            sectionName: https
+
   - it: rewrites /api to / like the deprecated ingress rewrite-target
     set:
       gateway.enabled: true
