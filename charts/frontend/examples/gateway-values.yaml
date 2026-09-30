@@ -1,9 +1,8 @@
-# NGINX Gateway Fabric: serves the whole hostname from the frontend Service.
+# Gateway API: serves the whole hostname from the frontend Service.
 #
-# Cluster prerequisites:
-#   * Gateway API CRDs and NGINX Gateway Fabric installed
-#   * a Gateway (not created by this chart) with an HTTPS listener whose hostname covers
-#     gateway.hostnames below, and whose TLS certificate is issued there
+# Attaches to the ListenerSet the backend release creates for the same hostnames
+# (see ../../backend/examples/gateway-values.yaml), so it requests no listener or
+# certificate itself. Set gateway.listenerSet.create instead to deploy it standalone.
 #
 #   helm install my-frontend arkemis/frontend -f gateway-values.yaml
 
@@ -13,12 +12,11 @@ image:
 
 gateway:
   enabled: true
-  parentRefs:
-    - name: nginx
-      namespace: nginx-gateway
-      sectionName: https
   hostnames:
     - app.example.com
+    - www.app.example.com
+  listenerSet:
+    name: my-app
 
 # Turn the deprecated Ingress off once the HTTPRoute is serving traffic.
 ingress:

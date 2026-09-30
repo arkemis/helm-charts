@@ -11,17 +11,9 @@ metadata:
   {{- end }}
 spec:
   parentRefs:
-    {{- range .Values.gateway.parentRefs }}
-    - group: {{ .group | default "gateway.networking.k8s.io" }}
-      kind: {{ .kind | default "Gateway" }}
-      name: {{ .name }}
-      {{- with .namespace }}
-      namespace: {{ . }}
-      {{- end }}
-      {{- with .sectionName }}
-      sectionName: {{ . }}
-      {{- end }}
-    {{- end }}
+    - group: gateway.networking.k8s.io
+      kind: ListenerSet
+      name: {{ include "frontend.listenerSetName" . }}
   {{- with .Values.gateway.hostnames }}
   hostnames:
     {{- range . }}

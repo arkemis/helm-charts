@@ -11,17 +11,9 @@ metadata:
   {{- end }}
 spec:
   parentRefs:
-    {{- range .Values.gateway.parentRefs }}
-    - group: {{ .group | default "gateway.networking.k8s.io" }}
-      kind: {{ .kind | default "Gateway" }}
-      name: {{ .name }}
-      {{- with .namespace }}
-      namespace: {{ . }}
-      {{- end }}
-      {{- with .sectionName }}
-      sectionName: {{ . }}
-      {{- end }}
-    {{- end }}
+    - group: gateway.networking.k8s.io
+      kind: ListenerSet
+      name: {{ include "backend.listenerSetName" . }}
   {{- with .Values.gateway.hostnames }}
   hostnames:
     {{- range . }}
@@ -29,7 +21,7 @@ spec:
     {{- end }}
   {{- end }}
   rules:
-    {{- if .Values.gateway.internal.enabled }}
+    {{- if and .Values.gateway.nginx.enabled .Values.gateway.nginx.internal.enabled }}
     - matches:
         - path:
             type: PathPrefix

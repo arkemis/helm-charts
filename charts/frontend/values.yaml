@@ -132,39 +132,49 @@ service:
 ingress:
   # -- DEPRECATED (use `gateway.enabled`): Enable ingress
   enabled: true
-  # -- DEPRECATED (use `gateway.parentRefs`): Ingress class name
+  # -- DEPRECATED (use `gateway.listenerSet.gateway`): Ingress class name
   ingressClassName: nginx
-  # -- DEPRECATED (the Gateway listener owns TLS): cert-manager ClusterIssuer name
+  # -- DEPRECATED (use `gateway.listenerSet.certIssuer`): cert-manager ClusterIssuer name
   certIssuer: cert-manager-global
   # -- DEPRECATED (use `gateway.hostnames`): List of ingress hostnames
   hosts: []
   # -- DEPRECATED (use `gateway.annotations`): Additional ingress annotations
   annotations: {}
 
-## Gateway API parameters (NGINX Gateway Fabric)
+## Gateway API parameters. Everything outside `gateway.nginx` is standard Gateway API
 gateway:
   # -- Enable HTTPRoute (Gateway API). Replaces the deprecated `ingress`
   enabled: false
-  # -- Parents the HTTPRoute attaches to. Each entry takes `name` plus optional `group`/`kind` (default `Gateway`; set `kind: ListenerSet` to attach to a ListenerSet), `namespace` and `sectionName`. The parent, its TLS listener and its certificate are not managed by this chart
-  parentRefs:
-    - name: nginx
-      namespace: nginx-gateway
-      sectionName: https
-  # -- List of hostnames served by the HTTPRoute (empty matches every hostname of the Gateway listener)
+  # -- Hostnames served by the HTTPRoute; with `listenerSet.create` also one HTTPS listener each and the certificate's DNS names
   hostnames: []
+  listenerSet:
+    # -- Create the ListenerSet and its cert-manager Certificate. Enable in exactly one release per set of hostnames; other releases attach to it by `name`
+    create: false
+    # -- ListenerSet the HTTPRoute attaches to. Defaults to this release's own when `create` is true; required otherwise
+    name: ""
+    # -- Shared Gateway the created ListenerSet attaches to
+    gateway:
+      name: nginx
+      namespace: nginx-gateway
+    # -- cert-manager ClusterIssuer for the created Certificate
+    certIssuer: cert-manager-gateway
   # -- Additional HTTPRoute annotations
   annotations: {}
-  # -- Per-rule HTTPRoute timeouts (`request`, `backendRequest`); set to `null` to use NGINX defaults
+  # -- Per-rule HTTPRoute timeouts (`request`, `backendRequest`); set to `null` to use controller defaults
   timeouts:
     request: 900s
     backendRequest: 900s
-  clientSettings:
-    # -- Enable the NGF ClientSettingsPolicy targeting the HTTPRoute
+  ## NGINX Gateway Fabric extensions
+  nginx:
+    # -- Render the NGINX Gateway Fabric extensions below. Set to `false` on any other Gateway API controller: their CRDs exist only where NGF is installed
     enabled: true
-    # -- Maximum client request body size
-    maxBodySize: 15m
-    # -- Client request body read timeout
-    bodyTimeout: 60s
+    clientSettings:
+      # -- Enable the NGF ClientSettingsPolicy targeting the HTTPRoute
+      enabled: true
+      # -- Maximum client request body size
+      maxBodySize: 15m
+      # -- Client request body read timeout
+      bodyTimeout: 60s
 
 ## ConfigMap parameters
 configMap:

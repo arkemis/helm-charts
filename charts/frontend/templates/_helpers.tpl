@@ -69,3 +69,16 @@ Constructs from image.registry, image.repository, and image.tag or image.digest.
   {{- printf "%s:%s" $image $tag -}}
 {{- end -}}
 {{- end }}
+
+{{/*
+ListenerSet the HTTPRoute attaches to: an explicit name, or this release's own.
+*/}}
+{{- define "frontend.listenerSetName" -}}
+{{- if .Values.gateway.listenerSet.name }}
+{{- .Values.gateway.listenerSet.name }}
+{{- else if .Values.gateway.listenerSet.create }}
+{{- include "frontend.fullname" . }}-frontend
+{{- else }}
+{{- fail "gateway.listenerSet.name is required unless gateway.listenerSet.create is true" }}
+{{- end }}
+{{- end }}

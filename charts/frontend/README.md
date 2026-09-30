@@ -11,36 +11,47 @@ helm install my-frontend arkemis/frontend
 
 ## Routing
 
-Traffic is exposed either through Gateway API (`gateway.*`, NGINX Gateway Fabric) or through the
-**deprecated** Ingress (`ingress.*`). Ready-made values files live in [`examples/`](examples).
+Traffic is exposed either through Gateway API (`gateway.*`) or through the **deprecated**
+Ingress (`ingress.*`). Ready-made values files live in [`examples/`](examples).
 
 ```bash
 helm install my-frontend arkemis/frontend -f examples/gateway-values.yaml
 ```
 
+### Gateway API layout
+
+Everything under `gateway.*` renders standard Gateway API and cert-manager resources, except
+`gateway.nginx.*`, which holds NGINX Gateway Fabric extensions. On another controller, set
+`gateway.nginx.enabled: false`; routes, listeners and certificates stay as they are.
+
+- `gateway.listenerSet.create: true` renders a `ListenerSet` with one HTTPS listener per entry in
+  `gateway.hostnames`, attached to the shared Gateway, plus one cert-manager `Certificate` covering all of
+  them. Enable it in exactly one release per set of hostnames (e.g. the backend).
+- Every release's `HTTPRoute` attaches to the ListenerSet named by `gateway.listenerSet.name` (its own
+  when it creates one), so a frontend and backend sharing hostnames set the same `name`.
+
 ### Prerequisites for `gateway.enabled`
 
-- Gateway API CRDs and [NGINX Gateway Fabric](https://docs.nginx.com/nginx-gateway-fabric/) installed
-  in the cluster.
-- A `Gateway` — **not** created by this chart — with an HTTPS listener whose `hostname` covers
-  `gateway.hostnames`, and whose TLS certificate is issued there. The chart renders only the
-  `HTTPRoute`; it no longer requests a certificate.
-- external-dns configured with the `gateway-httproute` source if DNS records should follow the route
-  (hostnames are read from `HTTPRoute.spec.hostnames`, not from an annotation).
+- Gateway API CRDs v1.5+ (for `ListenerSet`) and cert-manager installed in the cluster.
+- A shared `Gateway`, **not** created by this chart, whose `allowedListeners` admits ListenerSets
+  from the release namespace, and the ClusterIssuer named in `gateway.listenerSet.certIssuer`.
+- NGINX Gateway Fabric for the `gateway.nginx.*` extensions.
+- DNS records for `gateway.hostnames` pointing at the Gateway address (or external-dns with the
+  `gateway-httproute` source).
 
 ### Migrating from Ingress
 
 `ingress.*` still works and is unchanged, but is deprecated. Both paths may run side by side during
-the cutover — they render separate resources and do not conflict — so enable `gateway`, verify
+the cutover (they render separate resources and do not conflict), so enable `gateway`, verify
 traffic, then set `ingress.enabled: false`.
 
 | Deprecated Ingress setting | Gateway API equivalent |
 | -------------------------- | ---------------------- |
 | `ingress.enabled` | `gateway.enabled` |
 | `ingress.hosts` | `gateway.hostnames` |
-| `ingress.ingressClassName` | `gateway.parentRefs` (the Gateway selects the controller) |
-| `ingress.certIssuer` | none — the Gateway listener owns TLS |
-| `nginx.ingress.kubernetes.io/proxy-body-size` | `gateway.clientSettings.maxBodySize` (NGF `ClientSettingsPolicy`) |
+| `ingress.ingressClassName` | `gateway.listenerSet.gateway` (the Gateway selects the controller) |
+| `ingress.certIssuer` | `gateway.listenerSet.certIssuer` |
+| `nginx.ingress.kubernetes.io/proxy-body-size` | `gateway.nginx.clientSettings.maxBodySize` (NGF `ClientSettingsPolicy`) |
 | `nginx.ingress.kubernetes.io/proxy-read-timeout`, `proxy-send-timeout` | `gateway.timeouts.request`, `gateway.timeouts.backendRequest` |
 
 ## Values
@@ -59,24 +70,28 @@ traffic, then set `ingress.enabled: false`.
 | extraVolumes | list | `[]` | Additional volumes |
 | fullnameOverride | string | `""` | Override the fully qualified app name |
 | gateway.annotations | object | `{}` | Additional HTTPRoute annotations |
-| gateway.clientSettings.bodyTimeout | string | `"60s"` | Client request body read timeout |
-| gateway.clientSettings.enabled | bool | `true` | Enable the NGF ClientSettingsPolicy targeting the HTTPRoute |
-| gateway.clientSettings.maxBodySize | string | `"15m"` | Maximum client request body size |
 | gateway.enabled | bool | `false` | Enable HTTPRoute (Gateway API). Replaces the deprecated `ingress` |
-| gateway.hostnames | list | `[]` | List of hostnames served by the HTTPRoute (empty matches every hostname of the Gateway listener) |
-| gateway.parentRefs | list | `[{"name":"nginx","namespace":"nginx-gateway","sectionName":"https"}]` | Gateways to attach the HTTPRoute to (name, namespace, sectionName). The Gateway itself, its TLS listener and its certificate are not managed by this chart |
-| gateway.timeouts | object | `{"backendRequest":"900s","request":"900s"}` | Per-rule HTTPRoute timeouts (`request`, `backendRequest`); set to `null` to use NGINX defaults |
+| gateway.hostnames | list | `[]` | Hostnames served by the HTTPRoute; with `listenerSet.create` also one HTTPS listener each and the certificate's DNS names |
+| gateway.listenerSet.certIssuer | string | `"cert-manager-gateway"` | cert-manager ClusterIssuer for the created Certificate |
+| gateway.listenerSet.create | bool | `false` | Create the ListenerSet and its cert-manager Certificate. Enable in exactly one release per set of hostnames; other releases attach to it by `name` |
+| gateway.listenerSet.gateway | object | `{"name":"nginx","namespace":"nginx-gateway"}` | Shared Gateway the created ListenerSet attaches to |
+| gateway.listenerSet.name | string | `""` | ListenerSet the HTTPRoute attaches to. Defaults to this release's own when `create` is true; required otherwise |
+| gateway.nginx.clientSettings.bodyTimeout | string | `"60s"` | Client request body read timeout |
+| gateway.nginx.clientSettings.enabled | bool | `true` | Enable the NGF ClientSettingsPolicy targeting the HTTPRoute |
+| gateway.nginx.clientSettings.maxBodySize | string | `"15m"` | Maximum client request body size |
+| gateway.nginx.enabled | bool | `true` | Render the NGINX Gateway Fabric extensions below. Set to `false` on any other Gateway API controller: their CRDs exist only where NGF is installed |
+| gateway.timeouts | object | `{"backendRequest":"900s","request":"900s"}` | Per-rule HTTPRoute timeouts (`request`, `backendRequest`); set to `null` to use controller defaults |
+| image.digest | string | `""` | Container image digest (takes precedence over tag) |
 | image.pullPolicy | string | `"Always"` | Image pull policy |
 | image.pullSecrets | list | `[]` | List of image pull secret names |
-| image.digest | string | `""` | Container image digest (takes precedence over tag) |
 | image.registry | string | `"ghcr.io"` | Container image registry |
 | image.repository | string | `""` | Container image repository |
 | image.tag | string | `""` | Container image tag (defaults to chart appVersion) |
 | ingress.annotations | object | `{}` | DEPRECATED (use `gateway.annotations`): Additional ingress annotations |
-| ingress.certIssuer | string | `"cert-manager-global"` | DEPRECATED (the Gateway listener owns TLS): cert-manager ClusterIssuer name |
+| ingress.certIssuer | string | `"cert-manager-global"` | DEPRECATED (use `gateway.listenerSet.certIssuer`): cert-manager ClusterIssuer name |
 | ingress.enabled | bool | `true` | DEPRECATED (use `gateway.enabled`): Enable ingress |
 | ingress.hosts | list | `[]` | DEPRECATED (use `gateway.hostnames`): List of ingress hostnames |
-| ingress.ingressClassName | string | `"nginx"` | DEPRECATED (use `gateway.parentRefs`): Ingress class name |
+| ingress.ingressClassName | string | `"nginx"` | DEPRECATED (use `gateway.listenerSet.gateway`): Ingress class name |
 | kubernetesClusterDomain | string | `"cluster.local"` | Kubernetes cluster domain |
 | livenessProbe.enabled | bool | `true` | Enable liveness probe |
 | livenessProbe.failureThreshold | int | `6` | Failures before restarting |

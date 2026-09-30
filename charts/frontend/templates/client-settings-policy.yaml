@@ -1,4 +1,4 @@
-{{- if and .Values.gateway.enabled .Values.gateway.clientSettings.enabled }}
+{{- if and .Values.gateway.enabled .Values.gateway.nginx.enabled .Values.gateway.nginx.clientSettings.enabled }}
 apiVersion: gateway.nginx.org/v1alpha1
 kind: ClientSettingsPolicy
 metadata:
@@ -11,6 +11,6 @@ spec:
     kind: HTTPRoute
     name: {{ include "frontend.fullname" . }}-frontend
   body:
-    maxSize: {{ .Values.gateway.clientSettings.maxBodySize | quote }}
-    timeout: {{ .Values.gateway.clientSettings.bodyTimeout | quote }}
+    maxSize: {{ .Values.gateway.nginx.clientSettings.maxBodySize | quote }}
+    timeout: {{ .Values.gateway.nginx.clientSettings.bodyTimeout | quote }}
 {{- end }}

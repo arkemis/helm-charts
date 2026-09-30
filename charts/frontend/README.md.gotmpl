@@ -11,36 +11,47 @@ helm install my-frontend arkemis/frontend
 
 ## Routing
 
-Traffic is exposed either through Gateway API (`gateway.*`, NGINX Gateway Fabric) or through the
-**deprecated** Ingress (`ingress.*`). Ready-made values files live in [`examples/`](examples).
+Traffic is exposed either through Gateway API (`gateway.*`) or through the **deprecated**
+Ingress (`ingress.*`). Ready-made values files live in [`examples/`](examples).
 
 ```bash
 helm install my-frontend arkemis/frontend -f examples/gateway-values.yaml
 ```
 
+### Gateway API layout
+
+Everything under `gateway.*` renders standard Gateway API and cert-manager resources, except
+`gateway.nginx.*`, which holds NGINX Gateway Fabric extensions. On another controller, set
+`gateway.nginx.enabled: false`; routes, listeners and certificates stay as they are.
+
+- `gateway.listenerSet.create: true` renders a `ListenerSet` with one HTTPS listener per entry in
+  `gateway.hostnames`, attached to the shared Gateway, plus one cert-manager `Certificate` covering all of
+  them. Enable it in exactly one release per set of hostnames (e.g. the backend).
+- Every release's `HTTPRoute` attaches to the ListenerSet named by `gateway.listenerSet.name` (its own
+  when it creates one), so a frontend and backend sharing hostnames set the same `name`.
+
 ### Prerequisites for `gateway.enabled`
 
-- Gateway API CRDs and [NGINX Gateway Fabric](https://docs.nginx.com/nginx-gateway-fabric/) installed
-  in the cluster.
-- A `Gateway` — **not** created by this chart — with an HTTPS listener whose `hostname` covers
-  `gateway.hostnames`, and whose TLS certificate is issued there. The chart renders only the
-  `HTTPRoute`; it no longer requests a certificate.
-- external-dns configured with the `gateway-httproute` source if DNS records should follow the route
-  (hostnames are read from `HTTPRoute.spec.hostnames`, not from an annotation).
+- Gateway API CRDs v1.5+ (for `ListenerSet`) and cert-manager installed in the cluster.
+- A shared `Gateway`, **not** created by this chart, whose `allowedListeners` admits ListenerSets
+  from the release namespace, and the ClusterIssuer named in `gateway.listenerSet.certIssuer`.
+- NGINX Gateway Fabric for the `gateway.nginx.*` extensions.
+- DNS records for `gateway.hostnames` pointing at the Gateway address (or external-dns with the
+  `gateway-httproute` source).
 
 ### Migrating from Ingress
 
 `ingress.*` still works and is unchanged, but is deprecated. Both paths may run side by side during
-the cutover — they render separate resources and do not conflict — so enable `gateway`, verify
+the cutover (they render separate resources and do not conflict), so enable `gateway`, verify
 traffic, then set `ingress.enabled: false`.
 
 | Deprecated Ingress setting | Gateway API equivalent |
 | -------------------------- | ---------------------- |
 | `ingress.enabled` | `gateway.enabled` |
 | `ingress.hosts` | `gateway.hostnames` |
-| `ingress.ingressClassName` | `gateway.parentRefs` (the Gateway selects the controller) |
-| `ingress.certIssuer` | none — the Gateway listener owns TLS |
-| `nginx.ingress.kubernetes.io/proxy-body-size` | `gateway.clientSettings.maxBodySize` (NGF `ClientSettingsPolicy`) |
+| `ingress.ingressClassName` | `gateway.listenerSet.gateway` (the Gateway selects the controller) |
+| `ingress.certIssuer` | `gateway.listenerSet.certIssuer` |
+| `nginx.ingress.kubernetes.io/proxy-body-size` | `gateway.nginx.clientSettings.maxBodySize` (NGF `ClientSettingsPolicy`) |
 | `nginx.ingress.kubernetes.io/proxy-read-timeout`, `proxy-send-timeout` | `gateway.timeouts.request`, `gateway.timeouts.backendRequest` |
 
 {{ template "chart.requirementsSection" . }}

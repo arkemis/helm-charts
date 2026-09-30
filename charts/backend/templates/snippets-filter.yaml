@@ -1,4 +1,4 @@
-{{- if and .Values.gateway.enabled .Values.gateway.internal.enabled }}
+{{- if and .Values.gateway.enabled .Values.gateway.nginx.enabled .Values.gateway.nginx.internal.enabled }}
 apiVersion: gateway.nginx.org/v1alpha1
 kind: SnippetsFilter
 metadata:
@@ -9,7 +9,7 @@ spec:
   snippets:
     - context: http.server.location
       value: |
-        {{- range .Values.gateway.internal.allowedCidrs }}
+        {{- range .Values.gateway.nginx.internal.allowedCidrs }}
         allow {{ . }};
         {{- end }}
         deny all;

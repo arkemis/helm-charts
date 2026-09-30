@@ -1,11 +1,15 @@
-# NGINX Gateway Fabric: public /api route + internal-only /api/internal allowlist.
+# Gateway API: public /api route + internal-only /api/internal allowlist.
+#
+# This release owns the app's ListenerSet (one HTTPS listener per hostname) and its
+# cert-manager Certificate; the frontend release attaches to it by name
+# (see ../../frontend/examples/gateway-values.yaml).
 #
 # Cluster prerequisites:
-#   * Gateway API CRDs and NGINX Gateway Fabric installed
-#   * a Gateway (not created by this chart) with an HTTPS listener whose hostname covers
-#     gateway.hostnames below, and whose TLS certificate is issued there
-#   * NGF snippets filters enabled, only if gateway.internal is used:
-#     helm upgrade ... --set nginxGateway.snippetsFilters.enable=true
+#   * Gateway API CRDs (v1.5+, for ListenerSet) and cert-manager installed
+#   * a shared Gateway (not created by this chart) whose allowedListeners admits
+#     ListenerSets from this namespace, plus the ClusterIssuer named below
+#   * gateway.nginx.*: NGINX Gateway Fabric, with snippets enabled only if
+#     gateway.nginx.internal is used (--set nginxGateway.snippets.enable=true)
 #
 #   helm install my-backend arkemis/backend -f gateway-values.yaml
 
@@ -15,16 +19,21 @@ image:
 
 gateway:
   enabled: true
-  parentRefs:
-    - name: nginx
-      namespace: nginx-gateway
-      sectionName: https
   hostnames:
-    - api.example.com
-  internal:
-    enabled: true
-    allowedCidrs:
-      - 10.224.0.0/14
+    - app.example.com
+    - www.app.example.com
+  listenerSet:
+    create: true
+    name: my-app
+    gateway:
+      name: nginx
+      namespace: nginx-gateway
+    certIssuer: cert-manager-gateway
+  nginx:
+    internal:
+      enabled: true
+      allowedCidrs:
+        - 10.224.0.0/14
 
 # Turn the deprecated Ingress off once the HTTPRoute is serving traffic.
 ingress:

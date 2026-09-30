@@ -33,7 +33,15 @@ tests:
   - it: can be disabled
     set:
       gateway.enabled: true
-      gateway.clientSettings.enabled: false
+      gateway.nginx.clientSettings.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: renders nothing when the nginx extensions are off
+    set:
+      gateway.enabled: true
+      gateway.nginx.enabled: false
     asserts:
       - hasDocuments:
           count: 0
