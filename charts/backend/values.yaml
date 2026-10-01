@@ -128,29 +128,9 @@ service:
   # -- Service and container port
   port: 4000
 
-## Ingress parameters (DEPRECATED — use `gateway`)
-ingress:
-  # -- DEPRECATED (use `gateway.enabled`): Enable ingress
-  enabled: true
-  # -- DEPRECATED (use `gateway.listenerSet.gateway`): Ingress class name
-  ingressClassName: nginx
-  # -- DEPRECATED (use `gateway.listenerSet.certIssuer`): cert-manager ClusterIssuer name
-  certIssuer: cert-manager-global
-  # -- DEPRECATED (use `gateway.hostnames`): List of ingress hostnames
-  hosts: []
-  # -- DEPRECATED (use `gateway.annotations`): Additional ingress annotations (merged with chart defaults)
-  annotations: {}
-
-## Internal Ingress parameters (DEPRECATED — use `gateway.nginx.internal`)
-internalIngress:
-  # -- DEPRECATED (use `gateway.nginx.internal.enabled`): Enable internal ingress with IP whitelisting
-  enabled: false
-  # -- DEPRECATED (use `gateway.nginx.internal.allowedCidrs`): Comma-separated CIDR ranges allowed to access internal endpoints
-  whitelistSourceRange: ""
-
 ## Gateway API parameters. Everything outside `gateway.nginx` is standard Gateway API
 gateway:
-  # -- Enable HTTPRoute (Gateway API). Replaces the deprecated `ingress`
+  # -- Enable HTTPRoute (Gateway API)
   enabled: false
   # -- Hostnames served by the HTTPRoute; with `listenerSet.create` also one HTTPS listener each and the certificate's DNS names
   hostnames: []

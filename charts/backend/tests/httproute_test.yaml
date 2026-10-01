@@ -64,7 +64,7 @@ tests:
       - failedTemplate:
           errorMessage: gateway.listenerSet.name is required unless gateway.listenerSet.create is true
 
-  - it: rewrites /api to / like the deprecated ingress rewrite-target
+  - it: rewrites /api to /
     set:
       gateway.enabled: true
     asserts:

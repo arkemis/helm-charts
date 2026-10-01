@@ -11,8 +11,8 @@ helm install my-backend arkemis/backend
 
 ## Routing
 
-Traffic is exposed either through Gateway API (`gateway.*`) or through the **deprecated**
-Ingress (`ingress.*`, `internalIngress.*`). Ready-made values files live in [`examples/`](examples).
+Traffic is exposed through Gateway API (`gateway.*`). Ready-made values files live in
+[`examples/`](examples).
 
 ```bash
 helm install my-backend arkemis/backend -f examples/gateway-values.yaml
@@ -40,13 +40,12 @@ Everything under `gateway.*` renders standard Gateway API and cert-manager resou
 - DNS records for `gateway.hostnames` pointing at the Gateway address (or external-dns with the
   `gateway-httproute` source).
 
-### Migrating from Ingress
+### Upgrading from 0.4.x or earlier
 
-`ingress.*` still works and is unchanged, but is deprecated. Both paths may run side by side during
-the cutover (they render separate resources and do not conflict), so enable `gateway`, verify
-traffic, then set `ingress.enabled: false`.
+The Ingress (`ingress.*`, `internalIngress.*`) was removed in 0.6.0. Set the Gateway API equivalents
+below; the old keys are ignored.
 
-| Deprecated Ingress setting | Gateway API equivalent |
+| Removed Ingress setting | Gateway API equivalent |
 | -------------------------- | ---------------------- |
 | `ingress.enabled` | `gateway.enabled` |
 | `ingress.hosts` | `gateway.hostnames` |
@@ -73,7 +72,7 @@ traffic, then set `ingress.enabled: false`.
 | extraVolumes | list | `[]` | Additional volumes |
 | fullnameOverride | string | `""` | Override the fully qualified app name |
 | gateway.annotations | object | `{}` | Additional HTTPRoute annotations |
-| gateway.enabled | bool | `false` | Enable HTTPRoute (Gateway API). Replaces the deprecated `ingress` |
+| gateway.enabled | bool | `false` | Enable HTTPRoute (Gateway API) |
 | gateway.hostnames | list | `[]` | Hostnames served by the HTTPRoute; with `listenerSet.create` also one HTTPS listener each and the certificate's DNS names |
 | gateway.listenerSet.certIssuer | string | `"cert-manager-gateway"` | cert-manager ClusterIssuer for the created Certificate |
 | gateway.listenerSet.create | bool | `false` | Create the ListenerSet and its cert-manager Certificate. Enable in exactly one release per set of hostnames; other releases attach to it by `name` |
@@ -93,13 +92,6 @@ traffic, then set `ingress.enabled: false`.
 | image.registry | string | `"ghcr.io"` | Container image registry |
 | image.repository | string | `""` | Container image repository |
 | image.tag | string | `""` | Container image tag (defaults to chart appVersion) |
-| ingress.annotations | object | `{}` | DEPRECATED (use `gateway.annotations`): Additional ingress annotations (merged with chart defaults) |
-| ingress.certIssuer | string | `"cert-manager-global"` | DEPRECATED (use `gateway.listenerSet.certIssuer`): cert-manager ClusterIssuer name |
-| ingress.enabled | bool | `true` | DEPRECATED (use `gateway.enabled`): Enable ingress |
-| ingress.hosts | list | `[]` | DEPRECATED (use `gateway.hostnames`): List of ingress hostnames |
-| ingress.ingressClassName | string | `"nginx"` | DEPRECATED (use `gateway.listenerSet.gateway`): Ingress class name |
-| internalIngress.enabled | bool | `false` | DEPRECATED (use `gateway.nginx.internal.enabled`): Enable internal ingress with IP whitelisting |
-| internalIngress.whitelistSourceRange | string | `""` | DEPRECATED (use `gateway.nginx.internal.allowedCidrs`): Comma-separated CIDR ranges allowed to access internal endpoints |
 | kubernetesClusterDomain | string | `"cluster.local"` | Kubernetes cluster domain |
 | livenessProbe.enabled | bool | `true` | Enable liveness probe |
 | livenessProbe.failureThreshold | int | `6` | Failures before restarting |

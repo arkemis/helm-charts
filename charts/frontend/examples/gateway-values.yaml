@@ -17,7 +17,3 @@ gateway:
     - www.app.example.com
   listenerSet:
     name: my-app
-
-# Turn the deprecated Ingress off once the HTTPRoute is serving traffic.
-ingress:
-  enabled: false

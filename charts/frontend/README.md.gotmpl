@@ -11,8 +11,8 @@ helm install my-frontend arkemis/frontend
 
 ## Routing
 
-Traffic is exposed either through Gateway API (`gateway.*`) or through the **deprecated**
-Ingress (`ingress.*`). Ready-made values files live in [`examples/`](examples).
+Traffic is exposed through Gateway API (`gateway.*`). Ready-made values files live in
+[`examples/`](examples).
 
 ```bash
 helm install my-frontend arkemis/frontend -f examples/gateway-values.yaml
@@ -39,13 +39,12 @@ Everything under `gateway.*` renders standard Gateway API and cert-manager resou
 - DNS records for `gateway.hostnames` pointing at the Gateway address (or external-dns with the
   `gateway-httproute` source).
 
-### Migrating from Ingress
+### Upgrading from 0.4.x or earlier
 
-`ingress.*` still works and is unchanged, but is deprecated. Both paths may run side by side during
-the cutover (they render separate resources and do not conflict), so enable `gateway`, verify
-traffic, then set `ingress.enabled: false`.
+The Ingress (`ingress.*`) was removed in 0.6.0. Set the Gateway API equivalents
+below; the old keys are ignored.
 
-| Deprecated Ingress setting | Gateway API equivalent |
+| Removed Ingress setting | Gateway API equivalent |
 | -------------------------- | ---------------------- |
 | `ingress.enabled` | `gateway.enabled` |
 | `ingress.hosts` | `gateway.hostnames` |
