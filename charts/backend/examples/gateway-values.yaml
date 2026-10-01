@@ -34,7 +34,3 @@ gateway:
       enabled: true
       allowedCidrs:
         - 10.224.0.0/14
-
-# Turn the deprecated Ingress off once the HTTPRoute is serving traffic.
-ingress:
-  enabled: false

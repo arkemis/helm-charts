@@ -9,7 +9,7 @@ tests:
       - hasDocuments:
           count: 0
 
-  - it: targets the httproute and keeps the ingress body limit
+  - it: targets the httproute with the 15m body limit
     set:
       gateway.enabled: true
     asserts:
