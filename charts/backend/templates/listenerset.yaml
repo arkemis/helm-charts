@@ -1,0 +1,46 @@
+{{- if and .Values.gateway.enabled .Values.gateway.listenerSet.create }}
+{{- if not .Values.gateway.hostnames }}
+{{- fail "gateway.hostnames is required when gateway.listenerSet.create is true" }}
+{{- end }}
+{{- $tlsSecret := printf "%s-backend-tls" (include "backend.fullname" .) }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
+metadata:
+  name: {{ include "backend.listenerSetName" . }}
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
+spec:
+  parentRef:
+    group: gateway.networking.k8s.io
+    kind: Gateway
+    name: {{ .Values.gateway.listenerSet.gateway.name }}
+    namespace: {{ .Values.gateway.listenerSet.gateway.namespace }}
+  listeners:
+    {{- range $index, $hostname := .Values.gateway.hostnames }}
+    - name: https-{{ $index }}
+      protocol: HTTPS
+      port: 443
+      hostname: {{ $hostname | quote }}
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: {{ $tlsSecret }}
+    {{- end }}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ $tlsSecret }}
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
+spec:
+  secretName: {{ $tlsSecret }}
+  dnsNames:
+    {{- range .Values.gateway.hostnames }}
+    - {{ . | quote }}
+    {{- end }}
+  issuerRef:
+    group: cert-manager.io
+    kind: ClusterIssuer
+    name: {{ .Values.gateway.listenerSet.certIssuer }}
+{{- end }}

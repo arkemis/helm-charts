@@ -4,7 +4,7 @@ release:
 templates:
   - snippets-filter.yaml
 tests:
-  - it: renders nothing unless gateway.internal.enabled
+  - it: renders nothing unless gateway.nginx.internal.enabled
     set:
       gateway.enabled: true
     asserts:
@@ -14,8 +14,8 @@ tests:
   - it: allows the listed cidrs and denies everything else
     set:
       gateway.enabled: true
-      gateway.internal.enabled: true
-      gateway.internal.allowedCidrs:
+      gateway.nginx.internal.enabled: true
+      gateway.nginx.internal.allowedCidrs:
         - 10.224.0.0/14
         - 10.0.0.0/8
     asserts:
@@ -39,9 +39,18 @@ tests:
   - it: denies everything when no cidr is listed
     set:
       gateway.enabled: true
-      gateway.internal.enabled: true
+      gateway.nginx.internal.enabled: true
     asserts:
       - equal:
           path: spec.snippets[0].value
           value: |
             deny all;
+
+  - it: renders nothing when the nginx extensions are off
+    set:
+      gateway.enabled: true
+      gateway.nginx.enabled: false
+      gateway.nginx.internal.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0

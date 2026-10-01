@@ -1,0 +1,93 @@
+suite: frontend listenerset
+release:
+  name: my
+templates:
+  - listenerset.yaml
+tests:
+  - it: renders nothing unless gateway.listenerSet.create
+    set:
+      gateway.enabled: true
+      gateway.listenerSet.name: shared
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: attaches one HTTPS listener per hostname to the shared gateway
+    set:
+      gateway.enabled: true
+      gateway.listenerSet.create: true
+      gateway.hostnames:
+        - app.example.com
+        - www.app.example.com
+    documentSelector:
+      path: kind
+      value: ListenerSet
+    asserts:
+      - isAPIVersion:
+          of: gateway.networking.k8s.io/v1
+      # Must match the name httproute.yaml attaches to
+      - equal:
+          path: metadata.name
+          value: my-frontend-frontend
+      - equal:
+          path: spec.parentRef
+          value:
+            group: gateway.networking.k8s.io
+            kind: Gateway
+            name: nginx
+            namespace: nginx-gateway
+      - equal:
+          path: spec.listeners
+          value:
+            - name: https-0
+              protocol: HTTPS
+              port: 443
+              hostname: app.example.com
+              tls:
+                mode: Terminate
+                certificateRefs:
+                  - name: my-frontend-frontend-tls
+            - name: https-1
+              protocol: HTTPS
+              port: 443
+              hostname: www.app.example.com
+              tls:
+                mode: Terminate
+                certificateRefs:
+                  - name: my-frontend-frontend-tls
+
+  - it: issues one certificate for every hostname into the listener secret
+    set:
+      gateway.enabled: true
+      gateway.listenerSet.create: true
+      gateway.hostnames:
+        - app.example.com
+        - www.app.example.com
+    documentSelector:
+      path: kind
+      value: Certificate
+    asserts:
+      - isAPIVersion:
+          of: cert-manager.io/v1
+      - equal:
+          path: spec.secretName
+          value: my-frontend-frontend-tls
+      - equal:
+          path: spec.dnsNames
+          value:
+            - app.example.com
+            - www.app.example.com
+      - equal:
+          path: spec.issuerRef
+          value:
+            group: cert-manager.io
+            kind: ClusterIssuer
+            name: cert-manager-gateway
+
+  - it: fails without hostnames
+    set:
+      gateway.enabled: true
+      gateway.listenerSet.create: true
+    asserts:
+      - failedTemplate:
+          errorMessage: gateway.hostnames is required when gateway.listenerSet.create is true

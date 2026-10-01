@@ -3,6 +3,8 @@ release:
   name: my
 templates:
   - httproute.yaml
+set:
+  gateway.listenerSet.name: shared
 tests:
   - it: renders nothing unless gateway.enabled
     asserts:
@@ -25,13 +27,11 @@ tests:
           path: metadata.name
           value: my-backend-backend
       - equal:
-          path: spec.parentRefs[0]
+          path: spec.parentRefs
           value:
-            group: gateway.networking.k8s.io
-            kind: Gateway
-            name: nginx
-            namespace: nginx-gateway
-            sectionName: https
+            - group: gateway.networking.k8s.io
+              kind: ListenerSet
+              name: shared
       - equal:
           path: spec.hostnames[0]
           value: api.example.com
@@ -43,6 +43,26 @@ tests:
       - equal:
           path: spec.rules[0].timeouts.request
           value: 900s
+
+  - it: attaches to its own ListenerSet when it creates one
+    set:
+      gateway.enabled: true
+      gateway.listenerSet.create: true
+      gateway.listenerSet.name: null
+      gateway.hostnames:
+        - api.example.com
+    asserts:
+      - equal:
+          path: spec.parentRefs[0].name
+          value: my-backend-backend
+
+  - it: fails without a ListenerSet to attach to
+    set:
+      gateway.enabled: true
+      gateway.listenerSet.name: null
+    asserts:
+      - failedTemplate:
+          errorMessage: gateway.listenerSet.name is required unless gateway.listenerSet.create is true
 
   - it: rewrites /api to / like the deprecated ingress rewrite-target
     set:
@@ -65,11 +85,11 @@ tests:
           path: spec.rules[0].filters
           count: 1
 
-  - it: adds the allowlisted internal rule when gateway.internal.enabled
+  - it: adds the allowlisted internal rule when gateway.nginx.internal.enabled
     set:
       gateway.enabled: true
-      gateway.internal.enabled: true
-      gateway.internal.allowedCidrs:
+      gateway.nginx.internal.enabled: true
+      gateway.nginx.internal.allowedCidrs:
         - 10.224.0.0/14
     asserts:
       - lengthEqual:
@@ -101,3 +121,17 @@ tests:
           path: spec.hostnames
       - isNull:
           path: spec.rules[0].timeouts
+
+  # The internal rule references the NGF SnippetsFilter, so it must go with it
+  - it: drops the internal rule when the nginx extensions are off
+    set:
+      gateway.enabled: true
+      gateway.nginx.enabled: false
+      gateway.nginx.internal.enabled: true
+    asserts:
+      - lengthEqual:
+          path: spec.rules
+          count: 1
+      - equal:
+          path: spec.rules[0].matches[0].path.value
+          value: /api

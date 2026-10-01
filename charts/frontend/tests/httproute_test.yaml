@@ -3,6 +3,8 @@ release:
   name: my
 templates:
   - httproute.yaml
+set:
+  gateway.listenerSet.name: shared
 tests:
   - it: renders nothing unless gateway.enabled
     asserts:
@@ -25,13 +27,11 @@ tests:
           path: metadata.name
           value: my-frontend-frontend
       - equal:
-          path: spec.parentRefs[0]
+          path: spec.parentRefs
           value:
-            group: gateway.networking.k8s.io
-            kind: Gateway
-            name: nginx
-            namespace: nginx-gateway
-            sectionName: https
+            - group: gateway.networking.k8s.io
+              kind: ListenerSet
+              name: shared
       - equal:
           path: spec.hostnames[0]
           value: app.example.com
@@ -51,6 +51,26 @@ tests:
       - equal:
           path: spec.rules[0].timeouts.request
           value: 900s
+
+  - it: attaches to its own ListenerSet when it creates one
+    set:
+      gateway.enabled: true
+      gateway.listenerSet.create: true
+      gateway.listenerSet.name: null
+      gateway.hostnames:
+        - app.example.com
+    asserts:
+      - equal:
+          path: spec.parentRefs[0].name
+          value: my-frontend-frontend
+
+  - it: fails without a ListenerSet to attach to
+    set:
+      gateway.enabled: true
+      gateway.listenerSet.name: null
+    asserts:
+      - failedTemplate:
+          errorMessage: gateway.listenerSet.name is required unless gateway.listenerSet.create is true
 
   - it: does not rewrite the path
     set:
