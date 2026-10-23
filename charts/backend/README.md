@@ -18,6 +18,14 @@ Ingress (`ingress.*`, `internalIngress.*`). Ready-made values files live in [`ex
 helm install my-backend arkemis/backend -f examples/gateway-values.yaml
 ```
 
+NGINX routing returns `403 Forbidden` for `/api/lib/auth/super_admin/signup`, including
+trailing slashes and subpaths, before forwarding to the backend. The check uses the normalized
+URI and also matches `/lib/auth/super_admin/signup` after the `/api` rewrite.
+Gateway API applies this block when `gateway.nginx.enabled: true`; other controllers need
+an equivalent access rule. The deprecated NGINX Ingress uses a server snippet, preserving any
+custom `nginx.ingress.kubernetes.io/server-snippet`. Its controller must allow snippet annotations
+(`allow-snippet-annotations: "true"` and `annotations-risk-level: Critical`).
+
 ### Gateway API layout
 
 Everything under `gateway.*` renders standard Gateway API and cert-manager resources, except
@@ -36,13 +44,13 @@ Everything under `gateway.*` renders standard Gateway API and cert-manager resou
 - A shared `Gateway`, **not** created by this chart, whose `allowedListeners` admits ListenerSets
   from the release namespace, and the ClusterIssuer named in `gateway.listenerSet.certIssuer`.
 - NGINX Gateway Fabric for the `gateway.nginx.*` extensions, with snippets enabled
-  (`--set nginxGateway.snippets.enable=true`) only if `gateway.nginx.internal.enabled` is used.
+  (`--set nginxGateway.snippets.enable=true`) for the signup block and internal IP allowlist.
 - DNS records for `gateway.hostnames` pointing at the Gateway address (or external-dns with the
   `gateway-httproute` source).
 
 ### Migrating from Ingress
 
-`ingress.*` still works and is unchanged, but is deprecated. Both paths may run side by side during
+`ingress.*` still works, but is deprecated. Both paths may run side by side during
 the cutover (they render separate resources and do not conflict), so enable `gateway`, verify
 traffic, then set `ingress.enabled: false`.
 

@@ -19,8 +19,17 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-send-timeout: "900"
     nginx.ingress.kubernetes.io/rewrite-target: /$capture
     nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/server-snippet: |
+      {{- include "backend.blockSuperAdminSignup" . | nindent 6 }}
+      {{- with index .Values.ingress.annotations "nginx.ingress.kubernetes.io/server-snippet" }}
+      {{- . | nindent 6 }}
+      {{- end }}
     {{- end }}
-    {{- with .Values.ingress.annotations }}
+    {{- $annotations := .Values.ingress.annotations }}
+    {{- if eq .Values.ingress.ingressClassName "nginx" }}
+    {{- $annotations = omit $annotations "nginx.ingress.kubernetes.io/server-snippet" }}
+    {{- end }}
+    {{- with $annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:

@@ -8,8 +8,8 @@
 #   * Gateway API CRDs (v1.5+, for ListenerSet) and cert-manager installed
 #   * a shared Gateway (not created by this chart) whose allowedListeners admits
 #     ListenerSets from this namespace, plus the ClusterIssuer named below
-#   * gateway.nginx.*: NGINX Gateway Fabric, with snippets enabled only if
-#     gateway.nginx.internal is used (--set nginxGateway.snippets.enable=true)
+#   * gateway.nginx.*: NGINX Gateway Fabric, with snippets enabled for the signup
+#     block and internal IP allowlist (--set nginxGateway.snippets.enable=true)
 #
 #   helm install my-backend arkemis/backend -f gateway-values.yaml
 

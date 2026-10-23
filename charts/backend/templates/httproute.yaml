@@ -55,6 +55,13 @@ spec:
             path:
               type: ReplacePrefixMatch
               replacePrefixMatch: /
+        {{- if .Values.gateway.nginx.enabled }}
+        - type: ExtensionRef
+          extensionRef:
+            group: gateway.nginx.org
+            kind: SnippetsFilter
+            name: {{ include "backend.fullname" . }}-backend-block-signup
+        {{- end }}
       backendRefs:
         - name: {{ include "backend.fullname" . }}-backend
           port: {{ .Values.service.port }}

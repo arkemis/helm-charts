@@ -22,6 +22,35 @@ tests:
           path: metadata.annotations
           content:
             nginx.ingress.kubernetes.io/rewrite-target: /$capture
+            nginx.ingress.kubernetes.io/server-snippet: |
+              if ($uri ~* "^/(api/)?lib/auth/super_admin/signup(/|$)") {
+                return 403;
+              }
+
+  - it: preserves custom server snippets alongside the signup block
+    template: ingress.yaml
+    set:
+      ingress.annotations:
+        nginx.ingress.kubernetes.io/server-snippet: add_header X-Test preserved;
+        example.com/custom: preserved
+    asserts:
+      - isSubset:
+          path: metadata.annotations
+          content:
+            example.com/custom: preserved
+            nginx.ingress.kubernetes.io/server-snippet: |
+              if ($uri ~* "^/(api/)?lib/auth/super_admin/signup(/|$)") {
+                return 403;
+              }
+              add_header X-Test preserved;
+
+  - it: omits nginx snippets for other ingress controllers
+    template: ingress.yaml
+    set:
+      ingress.ingressClassName: other
+    asserts:
+      - isNull:
+          path: metadata.annotations["nginx.ingress.kubernetes.io/server-snippet"]
 
   - it: still renders the internal ingress with the source-range whitelist
     template: internal-ingress.yaml

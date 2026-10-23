@@ -1,4 +1,6 @@
 # DEPRECATED: ingress-nginx setup, kept as a migration reference. See gateway-values.yaml.
+# The signup block requires controller settings allow-snippet-annotations: "true"
+# and annotations-risk-level: Critical.
 
 image:
   repository: arkemishub/backend

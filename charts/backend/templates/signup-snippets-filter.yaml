@@ -1,0 +1,13 @@
+{{- if and .Values.gateway.enabled .Values.gateway.nginx.enabled }}
+apiVersion: gateway.nginx.org/v1alpha1
+kind: SnippetsFilter
+metadata:
+  name: {{ include "backend.fullname" . }}-backend-block-signup
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
+spec:
+  snippets:
+    - context: http.server.location
+      value: |
+        {{- include "backend.blockSuperAdminSignup" . | nindent 8 }}
+{{- end }}

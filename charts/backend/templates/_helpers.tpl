@@ -23,6 +23,13 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 {{- end }}
 
+{{/* Reject super-admin signup before proxying, with or without the /api rewrite. */}}
+{{- define "backend.blockSuperAdminSignup" -}}
+if ($uri ~* "^/(api/)?lib/auth/super_admin/signup(/|$)") {
+  return 403;
+}
+{{- end }}
+
 {{/*
 Create chart name and version as used by the chart label.
 */}}

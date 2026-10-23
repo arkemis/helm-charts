@@ -1,0 +1,37 @@
+suite: backend signup block
+release:
+  name: my
+templates:
+  - signup-snippets-filter.yaml
+tests:
+  - it: renders nothing when the gateway is disabled
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: blocks signup using the normalized URI before or after the API rewrite
+    set:
+      gateway.enabled: true
+    asserts:
+      - isKind:
+          of: SnippetsFilter
+      - equal:
+          path: metadata.name
+          value: my-backend-backend-block-signup
+      - equal:
+          path: spec.snippets[0].context
+          value: http.server.location
+      - equal:
+          path: spec.snippets[0].value
+          value: |
+            if ($uri ~* "^/(api/)?lib/auth/super_admin/signup(/|$)") {
+              return 403;
+            }
+
+  - it: renders nothing on other gateway controllers
+    set:
+      gateway.enabled: true
+      gateway.nginx.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
